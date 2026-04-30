@@ -1,0 +1,60 @@
+units: um
+random_seed: 20260424
+objective:
+  magnification: 10
+  NA_nominal: 0.25
+  immersion_n: 1.0
+  pupil_fill_ratio: 0.82
+  focus_shift_um_850_vs_visible: 0.0
+  defocus_um: 0.0
+oct:
+  center_wavelength_nm: 850
+  bandwidth_nm: 55
+  spectrometer_pixels: 2048
+  source_spectrum_file: calibration_data/source_spectrum_850.csv
+  pixel_to_lambda_file: calibration_data/pixel_to_lambda.csv
+  direct_psf_model: hybrid_rci
+  full_spectral_rci_depth_decimation: 1
+  reference_amplitude: 1.0
+  sample_amplitude: 1.0
+  window: hann
+microscope:
+  wavelength_nm: 850
+  camera_pixel_um: 3.45
+  magnification_total: 10
+  z_step_um: 0.25
+  z_count: 41
+  mode: widefield
+  bead_diameter_um: 0.2
+  background_adu: 0.0
+  camera_qe_file: calibration_data/camera_qe.csv
+  camera_flat_field_file: null
+  camera_dark_adu: 0.0
+  camera_saturation_adu: null
+illumination:
+  NA: 0.18
+  pupil_fill_ratio: 0.85
+  aperture_stop_radius: 0.9
+  field_stop_diameter_um: null
+sample:
+  scatterer_model: uniform_sphere_projection
+  scatterer_diameter_um: 0.2
+  particle_refractive_index: 1.59
+  medium_refractive_index: 1.33
+  measurement_path: epi_backscatter
+  background_amplitude: 0.0
+  background_subtract: true
+  darkfield_background_fraction: 0.05
+  scattering_lookup_file: null
+dichroic:
+  angle_deg: 45.0
+  table_file: calibration_data/dichroic_Rs_Rp_Ts_Tp_phase.csv
+  wedge_arcmin: 0.0
+errors:
+  dichroic_tilt_deg: 0.0
+  objective_focus_shift_um: 0.0
+  k_linearization_rms_pixel: 0.0
+  camera_read_noise_e: 2.0
+  photon_gain_e_per_adu: 5000.0
+  dispersion_quadratic_rad: 0.0
+  rolloff_per_um: 0.0

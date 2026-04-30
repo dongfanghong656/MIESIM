@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+.env
+*.egg-info/
+
+# Test/build artifacts
+.pytest_cache/
+.test-output/
+.coverage
+htmlcov/
+*.log
+
+# Project-specific large/transient outputs
+outputs/
+review_packages/
+tmp/
+logs/
+
+# Data files (large binaries)
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.mat
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store

@@ -1,0 +1,8 @@
+objective_model: scalar_low_NA_baseline
+NA_nominal: 0.25
+magnification: 10
+immersion_n: 1.0
+notes:
+  - Placeholder calibration notes for round3 review package.
+  - Replace with measured pupil, wavefront, Zemax POP, or objective datasheet values for physical claims.
+  - Current package intentionally keeps vector Debye and Zemax POP outside the supported claim boundary.
