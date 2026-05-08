@@ -657,7 +657,7 @@ def test_direct_model_comparison_rows_compare_hybrid_and_full_spectral():
 
     assert len(rows) == 1
     row = rows[0]
-    assert row["comparison_name"] == "hybrid_vs_full_spectral_rci_lowres"
+    assert row["comparison_name"] == "hybrid_vs_full_spectral_rci"
     assert row["hybrid_direct_model"] == "hybrid_rci"
     assert row["full_direct_model"] == "full_spectral_rci"
     assert int(row["full_spectral_rci_depth_decimation"]) == 3
@@ -800,21 +800,30 @@ def test_validation_runner_writes_data():
             shutil.rmtree(output_root, ignore_errors=True)
 
 
-def test_hybrid_vs_full_spectral_disagree_under_zernike_defocus():
-    """T1.3 negative control: under a non-trivial Zernike defocus (Z4 OPD),
-    the separable hybrid_rci approximation (single-wavelength axial gate x
-    through-focus product) must NOT agree with the proper full-spectral RCI
-    truth. We assert the on-axis axial-FWHM relative error exceeds a
-    sensitivity threshold so a future regression that silently makes hybrid
-    look like full-spectral would fail this test.
+def test_hybrid_vs_full_spectral_disagree_under_wide_bandwidth_defocus():
+    """T1.3 negative control: hybrid_rci uses a through-focus RCI stack at
+    the single center wavelength (_through_focus_rci_stack in
+    cop_oct_sim/oct_forward.py:146-147), while full_spectral_rci
+    integrates h_rci across all k with physical defocus applied per
+    wavelength (oct_forward.py:224-225). The two models MUST disagree
+    once chromatic focal shift becomes non-negligible, since physical
+    defocus phase scales as ~z/lambda: wider bandwidth -> stronger
+    chromatic focus smearing that only full-spectral captures.
+
+    If a future regression silently aligns the two models (re-creating
+    PRO Round 3 P0 #2 'hybrid as truth'), this test fails.
     """
     base = small_config()
+    # Wider bandwidth amplifies chromatic pupil variation; finite
+    # defocus amplifies the per-lambda focal shift.  Both are physics-
+    # based perturbations, not numerical tricks.
     aberrated = replace(
         base,
-        objective=replace(base.objective, defocus_um=0.30),
+        oct=replace(base.oct, bandwidth_nm=200.0),
+        objective=replace(base.objective, defocus_um=1.0),
     )
     rows = build_direct_model_comparison_rows(
-        aberrated, N=16, k_samples=32, pad_factor=1
+        aberrated, N=16, k_samples=64, pad_factor=1
     )
     assert rows, "comparison rows must not be empty"
     row = rows[0]
@@ -826,9 +835,11 @@ def test_hybrid_vs_full_spectral_disagree_under_zernike_defocus():
     axial_err = float(row["axial_fwhm_relative_error"])
     lateral_err = float(row["lateral_fwhm_relative_error"])
     assert (axial_err > sensitivity_threshold) or (lateral_err > sensitivity_threshold), (
-        f"hybrid and full-spectral agreed too closely under Z4 OPD defocus "
-        f"(axial_rel_err={axial_err:.4f}, lateral_rel_err={lateral_err:.4f}); "
-        f"this means either the aberration is not exercised or the two models "
-        f"have been silently aligned. Investigate _through_focus_rci_stack "
-        f"vs _full_spectral_rci_direct_psf in cop_oct_sim/oct_forward.py."
+        f"hybrid and full-spectral agreed too closely under wide "
+        f"bandwidth + finite defocus (axial_rel_err={axial_err:.4f}, "
+        f"lateral_rel_err={lateral_err:.4f}); this means either the "
+        f"chromatic focal shift is not propagating per-k in full-"
+        f"spectral, or the two models have been silently aligned. "
+        f"Investigate _through_focus_rci_stack vs "
+        f"_full_spectral_rci_direct_psf in cop_oct_sim/oct_forward.py."
     )
