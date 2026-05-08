@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Show toolchain
+        run: |
+          python --version
+          python -m pip --version
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r requirements.txt
+
+      - name: Install package (editable)
+        run: |
+          python -m pip install -e .
+
+      - name: Compile-check sources
+        run: |
+          python -m compileall -q cop_oct_sim scripts tests
+
+      - name: Run pytest
+        run: |
+          python -m pytest -q --maxfail=5
+
+      - name: Validation suite - minimal config
+        run: |
+          python scripts/run_validation_suite.py --config configs/config_minimal.yaml
+
+      - name: Validation suite - full_spectral_rci production smoke (strict)
+        run: |
+          python scripts/run_validation_suite.py \
+            --config configs/config_full_spectral_rci_production_smoke.yaml \
+            --strict-pass
+
+      - name: Upload validation outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-outputs-py${{ matrix.python-version }}
+          path: |
+            outputs/**/validation_summary.json
+            outputs/**/direct_model_comparison.csv
+            outputs/**/verdict.json
+          if-no-files-found: warn
+          retention-days: 14
