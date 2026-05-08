@@ -208,3 +208,69 @@ Phase 0 closed. Ready for Phase 1 T1.1 (promote `full_spectral_rci` decimation=1
 2. After CI smoke result is in: decide whether `axial_fwhm_relative_error` at decimation=1 is small enough (\u003c0.25) to flip `direct_model_comparison.pass=True`; if not, that becomes the next physics task.
 3. Add T1.2 proper: rename/move hybrid out of the truth path, keep it as a diagnostic-only column in `direct_model_comparison.csv`.
 4. Open Round 5 ticket for N4 (incident/detection pupil identity) — requires PRO consultation.
+
+## Phase 1 CI verification — green end-to-end (2026-05-08)
+
+Repo pushed to GitHub: `dongfanghong656/MIESIM` (mirror of `cop_oct_sim/`, 45 source files, no outputs/).
+Workflow: `.github/workflows/ci.yml` — Ubuntu / Py 3.11 / pip install / compileall / pytest / minimal validation / full_spectral_rci production smoke (`--strict-pass`).
+
+### CI run history
+
+| Run | SHA | Result | First failure |
+|---|---|---|---|
+| 25542700791 | 0421678 | FAIL | pytest: stale assertion `pilot_pass is False` (pre-N1 semantics) |
+| 25547158513 | c5b562c | FAIL | strict-pass smoke: `unmet_requirements` non-empty because production-smoke config still pinned `decimation: 3` |
+| 25548882884 | fad0465 | **PASS** | — |
+
+### Final passing run — verdict JSON snapshots
+
+**configs/config_minimal.yaml** (`runtime decimation=1`):
+```
+pilot_pass=True, review_required=False, blocker_count=0, failing_check_count=0
+unmet_requirements=[]
+```
+
+**configs/config_full_spectral_rci_production_smoke.yaml** (`runtime decimation=1`, `--strict-pass`):
+```
+pilot_pass=True, review_required=False, blocker_count=0, failing_check_count=0
+documented_limitations=3 entries (informational; not blockers)
+unmet_requirements=[]
+```
+
+`direct_model_comparison.csv` (production smoke):
+- on-axis axial FWHM: full_spectral 7.955 µm vs hybrid 7.291 µm → relative error **0.0835**, threshold 0.25 → **PASS**
+- lateral FWHM relative error: 0.0
+- peak_shift_um: 0.0
+- 3D NRMSE: 0.004
+- The lowres diagnostic row (`full_spectral_rci_interpolated=True`) is reported with `status=diagnostic` — it does not gate the verdict.
+
+This is the first time `direct_model_comparison` PASSes against true production-resolution full-spectral truth. Earlier runs showed 64% disagreement when decimation was silently being clamped to 3 by the `max(...,3)` floor in validation.py:356.
+
+### Config fix that closed the gate
+
+`configs/config_full_spectral_rci_production_smoke.yaml:17` — `full_spectral_rci_depth_decimation: 3 → 1`.
+The non-production `config_full_spectral_rci_smoke.yaml` stays at `decimation: 3` as the explicit low-resolution review/diagnostic artifact.
+
+### Test fix coupled to N1
+
+`tests/test_sanity.py:735-742` `test_validation_runner_writes_data` — was asserting `pilot_pass is False` and `blocker_count > 0` from the pre-N1 era when `pilot_pass` was structurally impossible. Updated to assert `pilot_pass is True`, `blocker_count == 0`, `unmet_requirements == []`, and that `documented_limitations`/`unsupported_claims` are still present for backwards compatibility.
+
+The companion `test_pilot_pass_false_when_review_required` (decimation=3) still passes — the new `unmet_requirements` rule fires for `decimation>1`, so the test continues to see `pilot_pass=False` as designed.
+
+### Phase 1 closeout status
+
+| PRO P0 | Status |
+|---|---|
+| 1. Defocus unit | ✅ Fixed (V0.1) — verified by CI compile + pytest |
+| 2. Hybrid as truth | ✅ Resolved — production smoke now uses full_spectral_rci at decimation=1 with on-axis FWHM gate at 8.35% relative error |
+| 3. Pass gate semantics | ✅ Fixed (V0.2) + N1 corrected the overcorrection — pilot_pass is now reachable and CI proves it green |
+| 4. Config paths | ✅ Fixed (V0.4) |
+| 5. Central-lobe / on-axis FWHM | ✅ Functions (V0.5) + N2 wired into gates |
+| 6. Low-resolution caveats | ✅ T1.1 unlocked decimation=1; production-smoke config updated |
+
+### Pending into Phase 2
+
+- T1.2 proper: explicitly demote `hybrid_rci` from `simulate_oct_psf_direct` API surface, keep as diagnostic-only column.
+- T1.3: dedicated negative test that injects low-NA aberration and asserts hybrid vs full_spectral disagree >25% → blocker fires.
+- N4 (Round 5 ticket): `oct_forward.py:_full_spectral_rci_direct_psf:224-225` — `pupil_i` and `pupil_d` use identical params; document in PHYSICS_CONTRACT.md or refactor.
+- V-gate completeness: Strehl ratio gate; differential dispersion in common-path; sensitivity roll-off vs spec depth-of-focus.

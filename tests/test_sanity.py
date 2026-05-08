@@ -798,3 +798,37 @@ def test_validation_runner_writes_data():
     finally:
         if output_root.exists():
             shutil.rmtree(output_root, ignore_errors=True)
+
+
+def test_hybrid_vs_full_spectral_disagree_under_zernike_defocus():
+    """T1.3 negative control: under a non-trivial Zernike defocus (Z4 OPD),
+    the separable hybrid_rci approximation (single-wavelength axial gate x
+    through-focus product) must NOT agree with the proper full-spectral RCI
+    truth. We assert the on-axis axial-FWHM relative error exceeds a
+    sensitivity threshold so a future regression that silently makes hybrid
+    look like full-spectral would fail this test.
+    """
+    base = small_config()
+    aberrated = replace(
+        base,
+        objective=replace(base.objective, defocus_um=0.30),
+    )
+    rows = build_direct_model_comparison_rows(
+        aberrated, N=16, k_samples=32, pad_factor=1
+    )
+    assert rows, "comparison rows must not be empty"
+    row = rows[0]
+
+    assert row["full_direct_model"] == "full_spectral_rci"
+    assert row["hybrid_direct_model"] == "hybrid_rci"
+
+    sensitivity_threshold = 0.05
+    axial_err = float(row["axial_fwhm_relative_error"])
+    lateral_err = float(row["lateral_fwhm_relative_error"])
+    assert (axial_err > sensitivity_threshold) or (lateral_err > sensitivity_threshold), (
+        f"hybrid and full-spectral agreed too closely under Z4 OPD defocus "
+        f"(axial_rel_err={axial_err:.4f}, lateral_rel_err={lateral_err:.4f}); "
+        f"this means either the aberration is not exercised or the two models "
+        f"have been silently aligned. Investigate _through_focus_rci_stack "
+        f"vs _full_spectral_rci_direct_psf in cop_oct_sim/oct_forward.py."
+    )

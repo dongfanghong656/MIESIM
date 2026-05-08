@@ -355,7 +355,7 @@ def build_direct_model_comparison_rows(
     k_samples: int = 24,
     pad_factor: int = 1,
 ) -> list[dict]:
-    depth_decimation = max(int(config.oct.full_spectral_rci_depth_decimation), 3)
+    depth_decimation = max(int(config.oct.full_spectral_rci_depth_decimation), 1)
     axial_rel_threshold = 0.25
     lateral_rel_threshold = 0.25
     hybrid_cfg = replace(config, oct=replace(config.oct, direct_psf_model="hybrid_rci"))
@@ -400,7 +400,7 @@ def build_direct_model_comparison_rows(
     )
     return [
         {
-            "comparison_name": "hybrid_vs_full_spectral_rci_lowres",
+            "comparison_name": "hybrid_vs_full_spectral_rci",
             "hybrid_direct_model": "hybrid_rci",
             "full_direct_model": "full_spectral_rci",
             "N": int(N),
@@ -448,7 +448,7 @@ def build_direct_model_axial_profile_rows(
     k_samples: int = 24,
     pad_factor: int = 1,
 ) -> list[dict]:
-    depth_decimation = max(int(config.oct.full_spectral_rci_depth_decimation), 3)
+    depth_decimation = max(int(config.oct.full_spectral_rci_depth_decimation), 1)
     hybrid_cfg = replace(config, oct=replace(config.oct, direct_psf_model="hybrid_rci"))
     full_cfg = replace(
         config,

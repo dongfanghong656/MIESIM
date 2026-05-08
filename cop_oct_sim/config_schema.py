@@ -21,7 +21,7 @@ class OCTConfig:
     spectrometer_pixels: int = 2048
     source_spectrum_file: str | None = None
     pixel_to_lambda_file: str | None = None
-    direct_psf_model: str = "hybrid_rci"
+    direct_psf_model: str = "full_spectral_rci"
     full_spectral_rci_depth_decimation: int = 1
     reference_amplitude: float = 1.0
     sample_amplitude: float = 1.0
