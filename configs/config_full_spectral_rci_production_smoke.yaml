@@ -14,7 +14,7 @@ oct:
   source_spectrum_file: null
   pixel_to_lambda_file: null
   direct_psf_model: full_spectral_rci
-  full_spectral_rci_depth_decimation: 3
+  full_spectral_rci_depth_decimation: 1
   reference_amplitude: 1.0
   sample_amplitude: 1.0
   window: hann
