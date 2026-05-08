@@ -733,11 +733,15 @@ def test_validation_runner_writes_data():
         assert summary["runtime_parameters"]["direct_psf_model"] == small_config().oct.direct_psf_model
         assert summary["runtime_parameters"]["full_spectral_rci_depth_decimation"] == 1
         assert summary["checks"]["all_pass"] is True
-        assert summary["verdict"]["pilot_pass"] is False
+        assert summary["verdict"]["pilot_pass"] is True
+        assert summary["verdict"]["review_required"] is False
+        assert summary["verdict"]["blocker_count"] == 0
+        assert summary["verdict"]["failing_check_count"] == 0
+        assert summary["verdict"]["unmet_requirements"] == []
+        assert isinstance(summary["verdict"]["documented_limitations"], list)
         assert isinstance(summary["verdict"]["unsupported_claims"], list)
         assert summary["checks"]["path_e_measured_predictive"]["pass"] is True
         assert summary["checks"]["direct_model_comparison"]["pass"] is True
-        assert summary["verdict"]["blocker_count"] > 0
         assert "axial_fwhm_relative_error" in summary["checks"]["path_e_measured_predictive"]
         assert "path_e_ideal_upper_bound" in summary["checks"]
         assert "scatterer_contract" in summary["checks"]
