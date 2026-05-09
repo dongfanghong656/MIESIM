@@ -37,6 +37,7 @@ from cop_oct_sim.metrics import (
     nrmse,
     normalize,
     on_axis_axial_fwhm,
+    strehl_ratio,
 )
 
 def small_config() -> SimulationConfig:
@@ -217,6 +218,13 @@ def test_defocus_stack_preserves_energy_without_plane_peak_normalization():
 
     assert np.ptp(peaks) > 0.05 * np.max(peaks)
     np.testing.assert_allclose(energy / energy[len(energy) // 2], np.ones_like(energy), rtol=1e-12)
+
+def test_strehl_ratio_is_one_for_identical_psfs():
+    psf = np.zeros((5, 5, 5), dtype=np.complex128)
+    psf[2, 2, 2] = 3.0 + 4.0j
+    psf[2, 2, 1] = 1.0
+
+    assert abs(strehl_ratio(psf, psf) - 1.0) < 1e-12
 
 def test_direct_oct_no_import_leak():
     assert no_leak_sanity()["pass"]
@@ -720,6 +728,31 @@ def test_pilot_pass_false_when_review_required():
         assert summary["verdict"]["review_required"] is True
         assert summary["verdict"]["pilot_pass"] is False
         assert summary["verdict"]["blocker_count"] > 0
+    finally:
+        if output_root.exists():
+            shutil.rmtree(output_root, ignore_errors=True)
+
+def test_strehl_v_gate_passes_for_unaberrated_minimal_config():
+    output_root = Path.cwd() / ".test-output" / f"pytest-strehl-pass-{uuid.uuid4().hex}"
+    try:
+        summary = run_validation_suite(output_root, small_config(), N=12, k_samples=24, pad_factor=1)
+        gate = summary["checks"]["strehl_v_gate"]
+        assert gate["pass"] is True
+        assert gate["strehl_ratio"] >= 0.80
+        assert "strehl_ratio" in gate
+    finally:
+        if output_root.exists():
+            shutil.rmtree(output_root, ignore_errors=True)
+
+def test_strehl_v_gate_fails_when_defocus_is_heavy():
+    base = small_config()
+    cfg = replace(base, objective=replace(base.objective, defocus_um=2.0))
+    output_root = Path.cwd() / ".test-output" / f"pytest-strehl-fail-{uuid.uuid4().hex}"
+    try:
+        summary = run_validation_suite(output_root, cfg, N=12, k_samples=24, pad_factor=1)
+        gate = summary["checks"]["strehl_v_gate"]
+        assert gate["pass"] is False
+        assert gate["strehl_ratio"] < gate["strehl_threshold"]
     finally:
         if output_root.exists():
             shutil.rmtree(output_root, ignore_errors=True)

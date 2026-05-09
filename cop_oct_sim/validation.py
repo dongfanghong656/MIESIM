@@ -4,7 +4,7 @@ import csv
 import json
 import platform
 import sys
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 
@@ -21,6 +21,7 @@ from .metrics import (
     compare_psf_volumes,
     lateral_fwhm_from_volume,
     sidelobe_ratio_1d,
+    strehl_ratio,
 )
 from .microscope_forward import simulate_microscope_zstack
 from .oct_forward import simulate_oct_psf_direct, simulate_oct_raw_direct
@@ -30,6 +31,10 @@ from .propagation import fraunhofer_psf_from_pupil, propagation_energy_ratio
 from .pupil import build_shared_pupil, clear_circular_pupil
 from .reconstruction import reconstruct_sd_oct
 from .theory_conversion import axial_profile_from_direct_psf, path_e_separable_psf, predict_axial_gate_from_source
+
+@dataclass(frozen=True)
+class ValidationConfig:
+    strehl_threshold: float = 0.80
 
 def _json_default(value):
     if isinstance(value, np.ndarray):
@@ -78,6 +83,54 @@ def _path_e_gate(
         "lateral_fwhm_relative_error": lateral_error,
         "lateral_fwhm_relative_error_threshold": lateral_fwhm_rel_threshold,
         "pass": bool(ok),
+    }
+
+def _ideal_reference_config(config: SimulationConfig) -> SimulationConfig:
+    return replace(
+        config,
+        objective=replace(config.objective, defocus_um=0.0),
+        errors=replace(
+            config.errors,
+            dichroic_tilt_deg=0.0,
+            objective_focus_shift_um=0.0,
+            k_linearization_rms_pixel=0.0,
+            camera_read_noise_e=0.0,
+            photon_gain_e_per_adu=0.0,
+            dispersion_quadratic_rad=0.0,
+            rolloff_per_um=0.0,
+        ),
+    )
+
+def _strehl_v_gate(
+    config: SimulationConfig,
+    actual_psf: np.ndarray,
+    *,
+    N: int,
+    k_samples: int,
+    pad_factor: int,
+    validation_config: ValidationConfig,
+) -> dict:
+    direct_model = config.oct.direct_psf_model.lower()
+    ideal_config = _ideal_reference_config(config)
+    ideal = simulate_oct_psf_direct(
+        ideal_config,
+        N=N,
+        pad_factor=pad_factor,
+        k_samples=k_samples,
+        full_spectral_rci=direct_model == "full_spectral_rci",
+    )
+    strehl = strehl_ratio(actual_psf, ideal["psf"])
+    threshold = float(validation_config.strehl_threshold)
+    return {
+        "name": "strehl_v_gate",
+        "strehl_ratio": float(strehl),
+        "strehl_threshold": threshold,
+        "strehl_normalization": "integrated_intensity",
+        "actual_objective_defocus_um": float(config.objective.defocus_um),
+        "ideal_reference_objective_defocus_um": float(ideal_config.objective.defocus_um),
+        "ideal_reference_errors_zeroed": True,
+        "direct_psf_model": direct_model,
+        "pass": bool(np.isfinite(strehl) and float(strehl) >= threshold),
     }
 
 def _provenance(stamp: str, config: SimulationConfig) -> dict:
@@ -630,8 +683,10 @@ def run_validation_suite(
     N: int = 48,
     k_samples: int = 160,
     pad_factor: int = 2,
+    validation_config: ValidationConfig | None = None,
 ) -> dict:
     config = config or SimulationConfig()
+    validation_config = validation_config or ValidationConfig()
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = Path(output_root) / f"validation_{stamp}"
     metrics_dir = out_dir / "metrics"
@@ -796,6 +851,14 @@ def run_validation_suite(
             "camera_flat_field_mean": float(np.mean(minimal["mic"]["camera_flat_field"])),
             "pass": bool(float(minimal["mic"]["camera_qe"]) >= 0.0),
         },
+        "strehl_v_gate": _strehl_v_gate(
+            config,
+            minimal["oct_direct"]["psf"],
+            N=N,
+            k_samples=k_samples,
+            pad_factor=pad_factor,
+            validation_config=validation_config,
+        ),
         "negative_controls": {
             "count": len(negative_rows),
             "detected_count": int(sum(1 for row in negative_rows if row["detected"])),
@@ -867,6 +930,7 @@ def run_validation_suite(
             "pad_factor": pad_factor,
             "direct_psf_model": minimal["direct_psf_model"],
             "full_spectral_rci_depth_decimation": int(config.oct.full_spectral_rci_depth_decimation),
+            "strehl_threshold": float(validation_config.strehl_threshold),
         },
         "config": config_to_dict(config),
         "checks": checks,

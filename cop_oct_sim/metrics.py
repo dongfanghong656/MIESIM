@@ -10,6 +10,30 @@ def nrmse(a: NDArray, b: NDArray) -> float:
     a = normalize(a); b = normalize(b)
     return float(np.sqrt(np.mean(np.abs(a - b) ** 2)))
 
+def strehl_ratio(psf_actual: NDArray, psf_ideal: NDArray) -> float:
+    """Return the energy-normalized on-axis Strehl ratio.
+
+    The on-axis voxel is the center sample of each PSF volume. Each PSF is
+    first normalized by integrated intensity so the metric is insensitive to
+    arbitrary complex-amplitude scale, but still detects focus-quality loss at
+    the common-path on-axis reference point. Independent peak normalization
+    would make the already peak-normalized direct PSF insensitive to defocus.
+    """
+    actual_i = np.abs(np.asarray(psf_actual)) ** 2
+    ideal_i = np.abs(np.asarray(psf_ideal)) ** 2
+    if actual_i.shape != ideal_i.shape:
+        raise ValueError(f"PSF shapes differ: actual={actual_i.shape}, ideal={ideal_i.shape}")
+    actual_energy = float(np.sum(actual_i)) if actual_i.size else 0.0
+    ideal_energy = float(np.sum(ideal_i)) if ideal_i.size else 0.0
+    if actual_energy <= 0.0 or ideal_energy <= 0.0:
+        return float("nan")
+    center = tuple(dim // 2 for dim in actual_i.shape)
+    actual_center = float(actual_i[center] / actual_energy)
+    ideal_center = float(ideal_i[center] / ideal_energy)
+    if ideal_center <= 0.0:
+        return float("nan")
+    return float(actual_center / ideal_center)
+
 def fwhm_1d(profile: NDArray, dx: float = 1.0) -> float:
     p = np.abs(profile)
     if p.max() <= 0:
