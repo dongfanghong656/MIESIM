@@ -110,3 +110,28 @@
 
 ### Open items carried forward
 - None for T5.5. The scalar common-path identity is now explicit; vector Debye or separated illumination/detection pupils remain Round 6 scope.
+
+## T5.6 — Round-4 response package (2026-05-10, SHA e138504 + c1f96d0)
+
+### What changed
+- `scripts/plot_round4_axial_lines.py` generates four on-axis axial magnitude PNGs at `scatterer_z_um = 0, 5, 10, 20`.
+- `scripts/build_review_package.py --round 4` builds `review_packages/round4_response_<timestamp>/response.docx` plus lightweight CSV/PNG evidence and a `package_manifest.json`.
+- The response DOCX covers the Round-4 P0-by-P0 response, faithfulness number, T1.3 finding, and Round-5 V-gate evidence.
+- `.github/workflows/ci.yml` now runs `python scripts/build_review_package.py --round 4` after the validation suites and uploads `round4-response-package-py3.11`.
+- `tests/test_sanity.py` adds a DOCX structure test for the Round-4 response writer.
+- Follow-up fix `c1f96d0` keeps the response package lightweight by copying only metrics and plots; full H5 outputs remain in the validation artifact.
+
+### Verification
+- Local AST parse passed for `scripts/build_review_package.py`, `scripts/plot_round4_axial_lines.py`, and `tests/test_sanity.py`.
+- Local plot smoke: `python scripts/plot_round4_axial_lines.py --config configs/config_minimal.yaml --output-root .codex-tmp/round4_axial_lines --N 12 --k-samples 24 --pad-factor 1` generated four PNGs.
+- Local package smoke with a fake validation directory produced `response.docx`, metrics evidence, four axial-line PNGs, `SHA256SUMS.txt`, and a zip package.
+- Local full pytest: `python -m pytest tests/test_sanity.py -q` -> 52 passed.
+- First CI run for `e138504` succeeded, but revealed an oversized `round4-response-package-py3.11` artifact because full H5 validation outputs were copied into the response package.
+- Fix CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/25606208085 — success.
+- Corrected CI artifacts:
+  - `round4-response-package-py3.11`: `168847` bytes, containing one `response.docx`, four PNGs, and `package_manifest.json`.
+  - `validation-outputs-py3.11`: includes two validation summaries with `verdict.pilot_pass = true`.
+- CI `direct_model_comparison.csv` retains the Round-4 faithfulness floor: `axial_fwhm_relative_error = 7.232718201331539e-05`, `nrmse_3d = 3.851839665003354e-06`, `full_spectral_rci_interpolated = False`.
+
+### Open items carried forward
+- The DOCX is generated as a compact standards-compliant OOXML file without embedded PNGs; the PNGs are delivered as sibling evidence files in the CI artifact.
