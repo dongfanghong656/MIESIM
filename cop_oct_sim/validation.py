@@ -36,6 +36,9 @@ from .theory_conversion import axial_profile_from_direct_psf, path_e_separable_p
 @dataclass(frozen=True)
 class ValidationConfig:
     strehl_threshold: float = 0.80
+    phase_stability_max_std_rad: float = 0.05
+    phase_stability_repeats: int = 8
+    phase_stability_reflector_z_um: float = 20.0
 
 def _json_default(value):
     if isinstance(value, np.ndarray):
@@ -182,6 +185,60 @@ def _sensitivity_rolloff_v_gate(
         "relative_error_threshold": 0.15,
         "measurement": measured,
         "pass": bool(np.isfinite(measured_value) and np.isfinite(theoretical) and relative_error <= 0.15),
+    }
+
+def _phase_stability_v_gate(
+    config: SimulationConfig,
+    *,
+    N: int,
+    k_samples: int,
+    validation_config: ValidationConfig,
+) -> dict:
+    reflector_z_um = float(validation_config.phase_stability_reflector_z_um)
+    n_repeats = max(int(validation_config.phase_stability_repeats), 2)
+    max_std = float(validation_config.phase_stability_max_std_rad)
+    read_noise_e = max(float(config.errors.camera_read_noise_e), 0.0)
+    gain = max(float(config.errors.photon_gain_e_per_adu), 1e-12)
+    raw_noise_sigma = read_noise_e / gain
+    rng = np.random.default_rng(int(config.random_seed) + 5400)
+    phases = []
+    selected_depths = []
+    for _ in range(n_repeats):
+        raw = simulate_oct_raw_direct(
+            config,
+            N=max(min(int(N), 32), 12),
+            k_samples=max(min(int(k_samples), 96), 32),
+            scatterer_z_um=reflector_z_um,
+        )
+        noisy_raw = raw["raw"].astype(np.float64) + rng.normal(0.0, raw_noise_sigma, size=raw["raw"].shape)
+        recon = reconstruct_sd_oct(
+            noisy_raw,
+            raw["k"],
+            dispersion_phase=raw["dispersion_phase_rad"],
+            window=config.oct.window,
+            source_spectrum=raw["source"],
+            return_depth=True,
+        )
+        depth_um = recon["depth_um"]
+        idx = int(np.argmin(np.abs(depth_um - reflector_z_um)))
+        selected_depths.append(float(depth_um[idx]))
+        phases.append(float(np.angle(recon["complex"][idx])))
+    unwrapped = np.unwrap(np.asarray(phases, dtype=np.float64))
+    phase_std = float(np.std(unwrapped))
+    return {
+        "name": "phase_stability_v_gate",
+        "reflector_forward_model": "simulate_oct_raw_direct",
+        "reconstruction_model": "reconstruct_sd_oct",
+        "reflector_z_um": reflector_z_um,
+        "selected_depth_um_mean": float(np.mean(selected_depths)),
+        "n_repeats": n_repeats,
+        "camera_read_noise_e": read_noise_e,
+        "photon_gain_e_per_adu": gain,
+        "raw_noise_sigma": float(raw_noise_sigma),
+        "phase_std_rad": phase_std,
+        "phase_std_threshold_rad": max_std,
+        "phases_rad": phases,
+        "pass": bool(np.isfinite(phase_std) and phase_std <= max_std),
     }
 
 def _provenance(stamp: str, config: SimulationConfig) -> dict:
@@ -914,6 +971,12 @@ def run_validation_suite(
             config,
             N=N,
             k_samples=k_samples,
+        ),
+        "phase_stability_v_gate": _phase_stability_v_gate(
+            config,
+            N=N,
+            k_samples=k_samples,
+            validation_config=validation_config,
         ),
         "negative_controls": {
             "count": len(negative_rows),

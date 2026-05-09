@@ -25,6 +25,8 @@ from cop_oct_sim.spectrometer import (
 from cop_oct_sim.theory_conversion import predict_axial_gate_from_source
 from cop_oct_sim.validation import (
     _sensitivity_rolloff_v_gate,
+    _phase_stability_v_gate,
+    ValidationConfig,
     airy_sanity,
     axial_bandwidth_sanity,
     build_convergence_rows,
@@ -598,6 +600,29 @@ def test_sensitivity_rolloff_v_gate_fails_when_rolloff_grossly_wrong():
     gate = _sensitivity_rolloff_v_gate(bad_cfg, N=16, k_samples=64)
     assert gate["pass"] is False
     assert gate["relative_error"] > gate["relative_error_threshold"]
+
+def test_phase_stability_uses_propagated_reflector():
+    gate = _phase_stability_v_gate(
+        small_config(),
+        N=16,
+        k_samples=64,
+        validation_config=ValidationConfig(phase_stability_repeats=3),
+    )
+    assert gate["reflector_forward_model"] == "simulate_oct_raw_direct"
+    assert gate["reconstruction_model"] == "reconstruct_sd_oct"
+    assert gate["reflector_z_um"] == 20.0
+    assert gate["n_repeats"] == 3
+    assert "raw_noise_sigma" in gate
+
+def test_phase_stability_passes_on_minimal():
+    gate = _phase_stability_v_gate(
+        small_config(),
+        N=16,
+        k_samples=64,
+        validation_config=ValidationConfig(phase_stability_repeats=4),
+    )
+    assert gate["pass"] is True
+    assert gate["phase_std_rad"] <= gate["phase_std_threshold_rad"]
 
 def test_configured_finite_bead_broadens_microscope_stack_axially():
     base = small_config()

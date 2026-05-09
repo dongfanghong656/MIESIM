@@ -58,6 +58,11 @@ alpha_total = db_per_mm_to_amplitude_rolloff_per_um(theoretical_sensitivity_roll
 - `errors.rolloff_per_um` is therefore an additional empirical error term, not the sole spectrometer roll-off source.
 - `checks["sensitivity_rolloff_v_gate"]` fits the roll-off slope from forward-model `oct_raw` roll-off amplitudes and compares it with `theoretical_sensitivity_rolloff_db_per_mm(config)`.
 
+## Phase Stability
+
+- `checks["phase_stability_v_gate"]` is measured through the OCT forward and reconstruction path, not by injecting phase noise directly.
+- The validation path simulates a point reflector with `simulate_oct_raw_direct`, adds Gaussian read noise using `errors.camera_read_noise_e / errors.photon_gain_e_per_adu`, reconstructs with `reconstruct_sd_oct`, and reports the phase standard deviation at the reflector depth over repeated draws.
+
 ## Gate Semantics
 
 - `checks.all_pass` means every implemented machine gate passed.
