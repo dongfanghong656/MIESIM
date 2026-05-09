@@ -352,14 +352,30 @@ def build_round4_response_package(
     evidence_dir = package_dir / "evidence"
     evidence_dir.mkdir()
 
-    validation_target = evidence_dir / "validation" / validation_dir.name
-    _copytree(validation_dir, validation_target)
+    copied_metrics: list[str] = []
     for relative in [
         Path("metrics") / "validation_summary.json",
         Path("metrics") / "direct_model_comparison.csv",
         Path("metrics") / "direct_model_axial_profiles.csv",
     ]:
         _copy_if_exists(validation_dir / relative, evidence_dir / relative)
+        if (validation_dir / relative).exists():
+            copied_metrics.append(relative.as_posix())
+    (
+        evidence_dir / "validation_source_manifest.json"
+    ).write_text(
+        json.dumps(
+            {
+                "validation_dir_name": validation_dir.name,
+                "validation_dir_path": str(validation_dir),
+                "copied_metrics": copied_metrics,
+                "large_binary_outputs_copied": False,
+                "large_binary_outputs_note": "Round-4 response package intentionally copies lightweight metrics and plots only; full H5 validation outputs remain in validation artifacts.",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     plots_dir = evidence_dir / "round4_axial_lines"
     plot_manifest = generate_round4_axial_line_plots(
