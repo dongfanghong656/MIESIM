@@ -4,7 +4,9 @@ from pathlib import Path
 import numpy as np
 
 from .config_schema import SimulationConfig
-from .grids import KGrid, make_gaussian_k_grid
+from .grids import KGrid, fft_depth_axis_um, make_gaussian_k_grid
+
+DB_PER_NEPER = 20.0 / np.log(10.0)
 
 def normalize_source(source: np.ndarray) -> np.ndarray:
     source = np.clip(np.asarray(source, dtype=np.float64), 0.0, None)
@@ -119,6 +121,27 @@ def differential_dispersion_phase(config: SimulationConfig, k: np.ndarray) -> np
         - float(config.errors.reference_dispersion_quadratic_rad)
     )
     return mismatch * xi**2
+
+def amplitude_rolloff_per_um_to_db_per_mm(alpha_per_um: float) -> float:
+    return float(DB_PER_NEPER * 1000.0 * max(float(alpha_per_um), 0.0))
+
+def db_per_mm_to_amplitude_rolloff_per_um(db_per_mm: float) -> float:
+    return float(max(float(db_per_mm), 0.0) / (DB_PER_NEPER * 1000.0))
+
+def theoretical_sensitivity_rolloff_db_per_mm(config: SimulationConfig) -> float:
+    """Return the spectrometer sampling roll-off slope in dB/mm."""
+    kgrid = make_oct_k_grid(config, config.oct.spectrometer_pixels)
+    k_linear = np.linspace(float(np.min(kgrid.k)), float(np.max(kgrid.k)), len(kgrid.k))
+    depth_um = fft_depth_axis_um(k_linear)
+    z_max_um = float(np.max(np.abs(depth_um))) if depth_um.size else 0.0
+    z_half_mm = max(0.5 * z_max_um * 1e-3, 1e-12)
+    return float(6.7 / z_half_mm)
+
+def effective_sensitivity_rolloff_per_um(config: SimulationConfig) -> float:
+    theoretical = db_per_mm_to_amplitude_rolloff_per_um(
+        theoretical_sensitivity_rolloff_db_per_mm(config)
+    )
+    return float(theoretical + max(float(config.errors.rolloff_per_um), 0.0))
 
 def apply_k_linearization_error(config: SimulationConfig, k: np.ndarray) -> np.ndarray:
     rms_px = float(config.errors.k_linearization_rms_pixel)

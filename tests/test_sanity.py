@@ -16,9 +16,15 @@ from cop_oct_sim.propagation import fraunhofer_psf_from_pupil, physical_defocus_
 from cop_oct_sim.pupil import build_shared_pupil
 from cop_oct_sim.reconstruction import reconstruct_sd_oct
 from cop_oct_sim.scatterers import sample_scattering_amplitude
-from cop_oct_sim.spectrometer import differential_dispersion_phase, make_oct_k_grid
+from cop_oct_sim.spectrometer import (
+    db_per_mm_to_amplitude_rolloff_per_um,
+    differential_dispersion_phase,
+    make_oct_k_grid,
+    theoretical_sensitivity_rolloff_db_per_mm,
+)
 from cop_oct_sim.theory_conversion import predict_axial_gate_from_source
 from cop_oct_sim.validation import (
+    _sensitivity_rolloff_v_gate,
     airy_sanity,
     axial_bandwidth_sanity,
     build_convergence_rows,
@@ -564,6 +570,34 @@ def test_rolloff_reduces_deep_raw_modulation():
     shallow_mod = np.std(shallow["raw"] - np.mean(shallow["raw"]))
     deep_mod = np.std(deep["raw"] - np.mean(deep["raw"]))
     assert deep_mod < shallow_mod
+
+def test_theoretical_sensitivity_rolloff_matches_leitgeb_form():
+    cfg = small_config()
+    slope = theoretical_sensitivity_rolloff_db_per_mm(cfg)
+    kgrid = make_oct_k_grid(cfg, cfg.oct.spectrometer_pixels)
+    k_linear = np.linspace(float(np.min(kgrid.k)), float(np.max(kgrid.k)), len(kgrid.k))
+    depth = np.fft.fftfreq(len(k_linear), d=abs(float(np.mean(np.diff(k_linear))))) * np.pi
+    z_max_um = float(np.max(np.abs(depth)))
+    drops = slope * np.array([0.0, 0.5 * z_max_um, z_max_um]) * 1e-3
+    np.testing.assert_allclose(drops, np.array([0.0, 6.7, 13.4]), rtol=1e-12, atol=1e-12)
+
+def test_sensitivity_rolloff_v_gate_passes_for_minimal():
+    gate = _sensitivity_rolloff_v_gate(small_config(), N=16, k_samples=64)
+    assert gate["pass"] is True
+    assert np.isfinite(gate["sensitivity_rolloff_db_per_mm"])
+
+def test_sensitivity_rolloff_v_gate_fails_when_rolloff_grossly_wrong():
+    cfg = small_config()
+    theoretical_per_um = db_per_mm_to_amplitude_rolloff_per_um(
+        theoretical_sensitivity_rolloff_db_per_mm(cfg)
+    )
+    bad_cfg = replace(
+        cfg,
+        errors=replace(cfg.errors, rolloff_per_um=10.0 * theoretical_per_um),
+    )
+    gate = _sensitivity_rolloff_v_gate(bad_cfg, N=16, k_samples=64)
+    assert gate["pass"] is False
+    assert gate["relative_error"] > gate["relative_error_threshold"]
 
 def test_configured_finite_bead_broadens_microscope_stack_axially():
     base = small_config()

@@ -43,6 +43,21 @@ xi(k) = 2 * (k - mean(k)) / (max(k) - min(k))
 - If the two coefficients are equal, the common-path quadratic dispersion contribution cancels to numerical zero.
 - `absolute_dispersion_phase(...)` exists only for diagnostics; direct OCT field assembly uses `differential_dispersion_phase(...)`.
 
+## Sensitivity Roll-Off
+
+- The scalar OCT forward model applies a finite-spectrometer sensitivity roll-off before reconstruction.
+- The baseline theoretical slope follows the practical Leitgeb/Yun-style convention used in the Round 5 review plan: approximately 6.7 dB loss at half the k-sampling Nyquist imaging range.
+- The modeled amplitude attenuation is:
+
+```text
+A(z) = exp(-|z_um| * alpha_total)
+alpha_total = db_per_mm_to_amplitude_rolloff_per_um(theoretical_sensitivity_rolloff_db_per_mm(config))
+              + max(errors.rolloff_per_um, 0)
+```
+
+- `errors.rolloff_per_um` is therefore an additional empirical error term, not the sole spectrometer roll-off source.
+- `checks["sensitivity_rolloff_v_gate"]` fits the roll-off slope from forward-model `oct_raw` roll-off amplitudes and compares it with `theoretical_sensitivity_rolloff_db_per_mm(config)`.
+
 ## Gate Semantics
 
 - `checks.all_pass` means every implemented machine gate passed.

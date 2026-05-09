@@ -12,7 +12,7 @@ from .pupil import build_shared_pupil
 from .propagation import fraunhofer_psf_from_pupil, physical_defocus_phase
 from .reconstruction import window_vector
 from .scatterers import effective_scatterer_diameter_um, sample_scattering_amplitude, scatterer_volume_offsets
-from .spectrometer import apply_k_linearization_error, differential_dispersion_phase, make_oct_k_grid
+from .spectrometer import apply_k_linearization_error, differential_dispersion_phase, effective_sensitivity_rolloff_per_um, make_oct_k_grid
 
 def _chromatic_physical_defocus_um(config: SimulationConfig, wavelength_nm: float) -> float:
     span = max(config.oct.bandwidth_nm, 1e-12)
@@ -23,7 +23,7 @@ def _tilt_waves_from_error(config: SimulationConfig) -> float:
     return np.deg2rad(config.errors.dichroic_tilt_deg) * 2.0
 
 def _rolloff_amplitude(config: SimulationConfig, z_um: float) -> float:
-    return float(np.exp(-abs(z_um) * max(config.errors.rolloff_per_um, 0.0)))
+    return float(np.exp(-abs(z_um) * effective_sensitivity_rolloff_per_um(config)))
 
 def _make_oct_pupil(
     config: SimulationConfig,

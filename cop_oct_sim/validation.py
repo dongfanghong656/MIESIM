@@ -30,6 +30,7 @@ from .pipelines import run_minimal
 from .propagation import fraunhofer_psf_from_pupil, propagation_energy_ratio
 from .pupil import build_shared_pupil, clear_circular_pupil
 from .reconstruction import reconstruct_sd_oct
+from .spectrometer import theoretical_sensitivity_rolloff_db_per_mm
 from .theory_conversion import axial_profile_from_direct_psf, path_e_separable_psf, predict_axial_gate_from_source
 
 @dataclass(frozen=True)
@@ -132,6 +133,55 @@ def _strehl_v_gate(
         "ideal_reference_errors_zeroed": True,
         "direct_psf_model": direct_model,
         "pass": bool(np.isfinite(strehl) and float(strehl) >= threshold),
+    }
+
+def _measured_sensitivity_rolloff_db_per_mm(
+    config: SimulationConfig,
+    *,
+    N: int,
+    k_samples: int,
+) -> dict:
+    depths_um = np.array([0.0, 20.0, 40.0], dtype=np.float64)
+    amplitudes = []
+    for depth in depths_um:
+        raw = simulate_oct_raw_direct(
+            config,
+            N=max(min(int(N), 32), 12),
+            k_samples=max(min(int(k_samples), 96), 32),
+            scatterer_z_um=float(depth),
+        )
+        amplitudes.append(float(raw["rolloff_amplitude"]))
+    amplitudes = np.asarray(amplitudes, dtype=np.float64)
+    ref = max(float(amplitudes[0]), 1e-12)
+    z_mm = np.abs(depths_um[1:]) * 1e-3
+    drop_db = -20.0 * np.log10(np.maximum(amplitudes[1:], 1e-12) / ref)
+    denom = max(float(np.dot(z_mm, z_mm)), 1e-18)
+    slope = float(np.dot(z_mm, drop_db) / denom)
+    return {
+        "depths_um": depths_um.tolist(),
+        "rolloff_amplitudes": amplitudes.tolist(),
+        "drop_db": drop_db.tolist(),
+        "measured_sensitivity_rolloff_db_per_mm": slope,
+    }
+
+def _sensitivity_rolloff_v_gate(
+    config: SimulationConfig,
+    *,
+    N: int,
+    k_samples: int,
+) -> dict:
+    theoretical = float(theoretical_sensitivity_rolloff_db_per_mm(config))
+    measured = _measured_sensitivity_rolloff_db_per_mm(config, N=N, k_samples=k_samples)
+    measured_value = float(measured["measured_sensitivity_rolloff_db_per_mm"])
+    relative_error = abs(measured_value - theoretical) / max(theoretical, 1e-12)
+    return {
+        "name": "sensitivity_rolloff_v_gate",
+        "sensitivity_rolloff_db_per_mm": theoretical,
+        "measured_sensitivity_rolloff_db_per_mm": measured_value,
+        "relative_error": float(relative_error),
+        "relative_error_threshold": 0.15,
+        "measurement": measured,
+        "pass": bool(np.isfinite(measured_value) and np.isfinite(theoretical) and relative_error <= 0.15),
     }
 
 def _provenance(stamp: str, config: SimulationConfig) -> dict:
@@ -859,6 +909,11 @@ def run_validation_suite(
             k_samples=k_samples,
             pad_factor=pad_factor,
             validation_config=validation_config,
+        ),
+        "sensitivity_rolloff_v_gate": _sensitivity_rolloff_v_gate(
+            config,
+            N=N,
+            k_samples=k_samples,
         ),
         "negative_controls": {
             "count": len(negative_rows),
