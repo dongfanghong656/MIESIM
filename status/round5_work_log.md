@@ -86,3 +86,27 @@
 
 ### Open items carried forward
 - None for T5.4.
+
+## T5.5 — Document + collapse common-path pupil identity (N4) (2026-05-09, SHA dc2dc0f)
+
+### What changed
+- `cop_oct_sim/oct_forward.py` adds `COMMON_PATH_PUPIL_IDENTITY_CONTRACT = "scalar_low_na_common_path_incident_detection_pupils_identical"`.
+- `cop_oct_sim/oct_forward.py` adds `_common_path_rci_from_shared_pupil(...)`, collapsing the scalar common-path `h_RCI = u_i * conj(u_d)` form to `u * conj(u)` for one shared OCT pupil.
+- `_through_focus_rci_stack(...)`, `_full_spectral_rci_direct_psf(...)`, `simulate_oct_raw_direct(...)`, and `simulate_oct_psf_direct(...)` now use the shared helper rather than rebuilding identical incident/detection pupils.
+- Direct OCT outputs now report `common_path_pupil_identity` and `common_path_pupil_identity_contract`; full-spectral RCI metadata also reports the same contract.
+- `tests/test_sanity.py` adds identity-collapse and metadata tests.
+- `PHYSICS_CONTRACT.md` documents the N4 common-path pupil identity and states that future vector Debye or separated-pupil work must introduce a new explicit contract.
+
+### Verification
+- Local AST parse passed for `cop_oct_sim/oct_forward.py` and `tests/test_sanity.py`.
+- Local targeted pytest: `python -m pytest tests/test_sanity.py -q -k "common_path_rci or full_spectral_rci_reports_common_path"` -> 2 passed.
+- Local pre/post numerical reference check on a `N=12`, `k_samples=24`, full-spectral RCI run:
+  - `psf_max_abs_diff = 0.0`
+  - `h_max_abs_diff = 0.0`
+- Local full pytest: `python -m pytest tests/test_sanity.py -q` -> 51 passed.
+- CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/25604462482 — success.
+- CI artifact `validation-outputs-py3.11` includes two `validation_summary.json` files with `verdict.pilot_pass = true` and the existing V-gates still passing.
+- CI `direct_model_comparison.csv` retains the Round-4 faithfulness floor exactly at the tracked values: `axial_fwhm_relative_error = 7.232718201331539e-05`, `nrmse_3d = 3.851839665003354e-06`, `full_spectral_rci_interpolated = False`.
+
+### Open items carried forward
+- None for T5.5. The scalar common-path identity is now explicit; vector Debye or separated illumination/detection pupils remain Round 6 scope.
