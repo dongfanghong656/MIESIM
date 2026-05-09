@@ -86,7 +86,9 @@ class ErrorConfig:
     k_linearization_rms_pixel: float = 0.0
     camera_read_noise_e: float = 2.0
     photon_gain_e_per_adu: float = 1.0
+    # Common-path OCT uses the mismatch between sample and reference dispersion.
     dispersion_quadratic_rad: float = 0.0
+    reference_dispersion_quadratic_rad: float = 0.0
     rolloff_per_um: float = 0.0
 
 @dataclass(frozen=True)

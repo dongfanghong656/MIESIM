@@ -108,9 +108,17 @@ def spectral_coordinate(k: np.ndarray) -> np.ndarray:
         return np.zeros_like(k)
     return 2.0 * (k - np.mean(k)) / span
 
-def dispersion_phase(config: SimulationConfig, k: np.ndarray) -> np.ndarray:
+def absolute_dispersion_phase(config: SimulationConfig, k: np.ndarray) -> np.ndarray:
     xi = spectral_coordinate(k)
     return config.errors.dispersion_quadratic_rad * xi**2
+
+def differential_dispersion_phase(config: SimulationConfig, k: np.ndarray) -> np.ndarray:
+    xi = spectral_coordinate(k)
+    mismatch = (
+        float(config.errors.dispersion_quadratic_rad)
+        - float(config.errors.reference_dispersion_quadratic_rad)
+    )
+    return mismatch * xi**2
 
 def apply_k_linearization_error(config: SimulationConfig, k: np.ndarray) -> np.ndarray:
     rms_px = float(config.errors.k_linearization_rms_pixel)

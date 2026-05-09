@@ -5,7 +5,7 @@ from .config_schema import SimulationConfig
 from .grids import fft_depth_axis_um
 from .metrics import normalize
 from .reconstruction import window_vector
-from .spectrometer import apply_k_linearization_error, dispersion_phase, make_oct_k_grid
+from .spectrometer import apply_k_linearization_error, differential_dispersion_phase, make_oct_k_grid
 
 def focal_plane_from_zstack(stack: NDArray) -> NDArray:
     arr = np.asarray(stack)
@@ -59,7 +59,7 @@ def predict_axial_gate_from_source(
     k_sorted = k_measured[order]
     k_linear = np.linspace(float(k_sorted.min()), float(k_sorted.max()), len(k_sorted))
     source_sorted = kgrid.source_spectrum[order]
-    dispersion_sorted = dispersion_phase(config, kgrid.k)[order]
+    dispersion_sorted = differential_dispersion_phase(config, kgrid.k)[order]
     source_linear = np.interp(k_linear, k_sorted, source_sorted)
     dispersion_linear = np.interp(k_linear, k_sorted, dispersion_sorted)
     spectral = (

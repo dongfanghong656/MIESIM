@@ -97,6 +97,7 @@ def _ideal_reference_config(config: SimulationConfig) -> SimulationConfig:
             camera_read_noise_e=0.0,
             photon_gain_e_per_adu=0.0,
             dispersion_quadratic_rad=0.0,
+            reference_dispersion_quadratic_rad=0.0,
             rolloff_per_um=0.0,
         ),
     )

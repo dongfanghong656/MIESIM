@@ -12,7 +12,7 @@ from .pupil import build_shared_pupil
 from .propagation import fraunhofer_psf_from_pupil, physical_defocus_phase
 from .reconstruction import window_vector
 from .scatterers import effective_scatterer_diameter_um, sample_scattering_amplitude, scatterer_volume_offsets
-from .spectrometer import apply_k_linearization_error, dispersion_phase, make_oct_k_grid
+from .spectrometer import apply_k_linearization_error, differential_dispersion_phase, make_oct_k_grid
 
 def _chromatic_physical_defocus_um(config: SimulationConfig, wavelength_nm: float) -> float:
     span = max(config.oct.bandwidth_nm, 1e-12)
@@ -290,7 +290,7 @@ def simulate_oct_raw_direct(
     Es = np.zeros_like(kgrid.k, dtype=np.complex128)
     h_rci_sample = np.zeros_like(kgrid.k, dtype=np.complex128)
     rolloff = _rolloff_amplitude(config, scatterer_z_um)
-    dispersion = dispersion_phase(config, kgrid.k)
+    dispersion = differential_dispersion_phase(config, kgrid.k)
     scatterer_diameter_um = effective_scatterer_diameter_um(config)
     scatter_amp = sample_scattering_amplitude(config, kgrid.wavelength_nm)
 
@@ -378,7 +378,7 @@ def simulate_oct_psf_direct(
         rci_stack[i] = (ui * np.conj(ud) * phase).astype(np.complex64)
 
     rolloff = _rolloff_amplitude(config, scatterer_z_um)
-    dispersion = dispersion_phase(config, kgrid.k)
+    dispersion = differential_dispersion_phase(config, kgrid.k)
     spectral = (
         rci_stack.astype(np.complex128)
         * rolloff

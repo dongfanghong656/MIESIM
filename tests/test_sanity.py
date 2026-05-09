@@ -16,6 +16,7 @@ from cop_oct_sim.propagation import fraunhofer_psf_from_pupil, physical_defocus_
 from cop_oct_sim.pupil import build_shared_pupil
 from cop_oct_sim.reconstruction import reconstruct_sd_oct
 from cop_oct_sim.scatterers import sample_scattering_amplitude
+from cop_oct_sim.spectrometer import differential_dispersion_phase, make_oct_k_grid
 from cop_oct_sim.theory_conversion import predict_axial_gate_from_source
 from cop_oct_sim.validation import (
     airy_sanity,
@@ -517,15 +518,30 @@ def test_on_axis_axial_fwhm_uses_center_pixel_not_off_axis_max():
     assert on_axis_axial_fwhm(volume, depth) < 4.0
     assert axial_fwhm(volume, depth) > 60.0
 
-def test_dispersion_residual_broadens_axial_psf():
+def test_dispersion_phase_cancels_when_reference_matches_sample():
+    cfg = replace(
+        small_config(),
+        errors=replace(
+            small_config().errors,
+            dispersion_quadratic_rad=5.0,
+            reference_dispersion_quadratic_rad=5.0,
+        ),
+    )
+    kgrid = make_oct_k_grid(cfg, 96)
+    phase = differential_dispersion_phase(cfg, kgrid.k)
+    assert float(np.max(np.abs(phase))) < 1e-12
+
+def test_dispersion_mismatch_broadens_axial_fwhm():
     cfg = small_config()
     clean = simulate_oct_psf_direct(cfg, N=24, pad_factor=1, k_samples=96)
     dispersed_cfg = replace(
         cfg,
-        errors=replace(cfg.errors, dispersion_quadratic_rad=25.0),
+        errors=replace(cfg.errors, dispersion_quadratic_rad=5.0, reference_dispersion_quadratic_rad=0.0),
     )
     dispersed = simulate_oct_psf_direct(dispersed_cfg, N=24, pad_factor=1, k_samples=96)
-    assert axial_fwhm(dispersed["psf"], dispersed["depth_um"]) > axial_fwhm(clean["psf"], clean["depth_um"])
+    clean_fwhm = axial_fwhm(clean["psf"], clean["depth_um"])
+    dispersed_fwhm = axial_fwhm(dispersed["psf"], dispersed["depth_um"])
+    assert dispersed_fwhm > 1.10 * clean_fwhm
 
 def test_k_linearization_error_returns_perturbed_measured_grid():
     cfg = small_config()
