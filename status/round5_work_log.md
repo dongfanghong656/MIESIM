@@ -63,3 +63,26 @@
 
 ### Open items carried forward
 - None for T5.3.
+
+## T5.4 — Phase-stability via propagated reflector (2026-05-09, SHA ca8f262)
+
+### What changed
+- `cop_oct_sim/validation.py` adds `ValidationConfig.phase_stability_max_std_rad`, `phase_stability_repeats`, and `phase_stability_reflector_z_um`.
+- `cop_oct_sim/validation.py` adds `_phase_stability_v_gate(...)`, which simulates a single reflector with `simulate_oct_raw_direct`, adds camera read noise through the existing `ErrorConfig.camera_read_noise_e` knob, reconstructs with `reconstruct_sd_oct`, and measures phase standard deviation across repeats.
+- `cop_oct_sim/validation.py` registers `checks["phase_stability_v_gate"]`.
+- `tests/test_sanity.py` adds `test_phase_stability_uses_propagated_reflector` and `test_phase_stability_passes_on_minimal`.
+- `PHYSICS_CONTRACT.md` documents the propagated-reflector phase-stability convention.
+
+### Verification
+- Local AST parse passed for `cop_oct_sim/validation.py` and `tests/test_sanity.py`.
+- Local targeted pytest: `python -m pytest tests/test_sanity.py -q -k "phase_stability"` -> 2 passed.
+- Local full pytest: `python -m pytest tests/test_sanity.py -q` -> 49 passed.
+- CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/25604099700 — success.
+- CI artifact `validation-outputs-py3.11` includes two `validation_summary.json` files with `checks.phase_stability_v_gate.pass = true`.
+- CI phase-stability values:
+  - minimal config: `phase_std_rad = 2.5616344142886695e-06`, `reflector_z_um = 20.0`, `n_repeats = 8`, `camera_read_noise_e = 2.0`.
+  - production smoke: `phase_std_rad = 3.262574608972163e-06`, `reflector_z_um = 20.0`, `n_repeats = 8`, `camera_read_noise_e = 2.0`.
+- CI `direct_model_comparison.csv` retains the Round-4 faithfulness floor: `axial_fwhm_relative_error = 7.232718201331539e-05`, `nrmse_3d = 3.851839665003354e-06`, `full_spectral_rci_interpolated = False`.
+
+### Open items carried forward
+- None for T5.4.
