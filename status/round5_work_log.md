@@ -39,3 +39,27 @@
 
 ### Open items carried forward
 - None for T5.2.
+
+## T5.3 — Sensitivity-rolloff V-gate (2026-05-09, SHA 3a48597)
+
+### What changed
+- `cop_oct_sim/spectrometer.py:125` adds amplitude roll-off unit conversion helpers.
+- `cop_oct_sim/spectrometer.py:131` adds `theoretical_sensitivity_rolloff_db_per_mm(config)` using the Round 5 6.7 dB-at-half-range convention.
+- `cop_oct_sim/spectrometer.py:140` adds `effective_sensitivity_rolloff_per_um(config)`.
+- `cop_oct_sim/oct_forward.py:26` applies the theoretical spectrometer roll-off plus `errors.rolloff_per_um` as an additional empirical error term.
+- `cop_oct_sim/validation.py:138` adds measured roll-off fitting from forward-model `oct_raw` roll-off amplitudes.
+- `cop_oct_sim/validation.py:167` adds `checks["sensitivity_rolloff_v_gate"]`.
+- `tests/test_sanity.py:574`, `tests/test_sanity.py:584`, and `tests/test_sanity.py:589` add the three T5.3 tests.
+- `PHYSICS_CONTRACT.md:46` documents the sensitivity roll-off convention.
+
+### Verification
+- Local full pytest: `python -m pytest tests/test_sanity.py -q` -> 47 passed.
+- CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/25603613595 — success.
+- CI artifact `validation-outputs-py3.11` includes two `validation_summary.json` files with `checks.sensitivity_rolloff_v_gate.pass = true`.
+- CI roll-off slopes:
+  - minimal config: theoretical = 5.11320193525492 dB/mm, measured = 5.11320193525492 dB/mm, relative error = 1.38962384970754e-15.
+  - production smoke: theoretical = 110.176045910177 dB/mm, measured = 110.176045910177 dB/mm, relative error = 1.28983161428643e-16.
+- CI `direct_model_comparison.csv` retains the Round-4 faithfulness floor: `axial_fwhm_relative_error = 7.232718201331539e-05`, `nrmse_3d = 3.851839665003354e-06`, `full_spectral_rci_interpolated = False`.
+
+### Open items carried forward
+- None for T5.3.
