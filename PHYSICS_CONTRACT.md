@@ -63,6 +63,21 @@ alpha_total = db_per_mm_to_amplitude_rolloff_per_um(theoretical_sensitivity_roll
 - `checks["phase_stability_v_gate"]` is measured through the OCT forward and reconstruction path, not by injecting phase noise directly.
 - The validation path simulates a point reflector with `simulate_oct_raw_direct`, adds Gaussian read noise using `errors.camera_read_noise_e / errors.photon_gain_e_per_adu`, reconstructs with `reconstruct_sd_oct`, and reports the phase standard deviation at the reflector depth over repeated draws.
 
+## Common-Path Pupil Identity (N4)
+
+- In the scalar low-NA common-path contract, the incident and detection OCT pupils are the same objective pupil after the same path coefficients are applied.
+- Therefore:
+
+```text
+pupil_i == pupil_d
+u_i == u_d == u
+h_RCI(x, y, z; k) = u_i * conj(u_d) = u * conj(u)
+```
+
+- The implementation records this as `COMMON_PATH_PUPIL_IDENTITY_CONTRACT = "scalar_low_na_common_path_incident_detection_pupils_identical"`.
+- This is an algebraic collapse of the existing model, not a new independent illumination/detection-pupil model.
+- Future vector Debye, off-axis pupil, or separated illumination/detection-pupil work must introduce a new explicit contract instead of silently changing this one.
+
 ## Gate Semantics
 
 - `checks.all_pass` means every implemented machine gate passed.

@@ -10,7 +10,12 @@ from cop_oct_sim.config_schema import IlluminationConfig, SampleConfig, Simulati
 from cop_oct_sim.grids import make_pupil_grid
 from cop_oct_sim.jones import apply_jones_to_scalar_pupil
 from cop_oct_sim.microscope_forward import simulate_microscope_zstack
-from cop_oct_sim.oct_forward import simulate_oct_psf_direct, simulate_oct_raw_direct
+from cop_oct_sim.oct_forward import (
+    COMMON_PATH_PUPIL_IDENTITY_CONTRACT,
+    _common_path_rci_from_shared_pupil,
+    simulate_oct_psf_direct,
+    simulate_oct_raw_direct,
+)
 from cop_oct_sim.pipelines import run_minimal
 from cop_oct_sim.propagation import fraunhofer_psf_from_pupil, physical_defocus_phase, propagation_energy_ratio, simple_defocus_stack
 from cop_oct_sim.pupil import build_shared_pupil
@@ -501,6 +506,27 @@ def test_physical_defocus_small_z_keeps_on_axis_rci_reasonable():
     ratio = abs(small_z_rci[cy, cx]) / max(abs(focused_rci[cy, cx]), 1e-12)
 
     assert ratio > 0.5
+
+def test_common_path_rci_collapses_identical_incident_detection_pupils():
+    grid = make_pupil_grid(32, 0.18)
+    pupil = build_shared_pupil(grid, 0.85, fill_ratio=0.82, defocus_um=0.1)
+
+    collapsed = _common_path_rci_from_shared_pupil(pupil, pad_factor=2)
+    ui = fraunhofer_psf_from_pupil(pupil, pad_factor=2)
+    ud = fraunhofer_psf_from_pupil(pupil, pad_factor=2)
+    legacy_two_pupil_form = ui * np.conj(ud)
+
+    np.testing.assert_allclose(collapsed, legacy_two_pupil_form, rtol=0.0, atol=0.0)
+    assert COMMON_PATH_PUPIL_IDENTITY_CONTRACT == "scalar_low_na_common_path_incident_detection_pupils_identical"
+
+def test_full_spectral_rci_reports_common_path_pupil_identity_contract():
+    cfg = small_config()
+    direct = simulate_oct_psf_direct(cfg, N=12, pad_factor=1, k_samples=24, full_spectral_rci=True)
+
+    assert bool(direct["common_path_pupil_identity"])
+    assert direct["common_path_pupil_identity_contract"] == COMMON_PATH_PUPIL_IDENTITY_CONTRACT
+    assert bool(direct["spectral_rci_common_path_pupil_identity"])
+    assert direct["spectral_rci_common_path_pupil_identity_contract"] == COMMON_PATH_PUPIL_IDENTITY_CONTRACT
 
 def test_central_lobe_fwhm_ignores_mirror_peak():
     profile = np.zeros(101, dtype=float)

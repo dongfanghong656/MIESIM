@@ -14,6 +14,10 @@ from .reconstruction import window_vector
 from .scatterers import effective_scatterer_diameter_um, sample_scattering_amplitude, scatterer_volume_offsets
 from .spectrometer import apply_k_linearization_error, differential_dispersion_phase, effective_sensitivity_rolloff_per_um, make_oct_k_grid
 
+COMMON_PATH_PUPIL_IDENTITY_CONTRACT = (
+    "scalar_low_na_common_path_incident_detection_pupils_identical"
+)
+
 def _chromatic_physical_defocus_um(config: SimulationConfig, wavelength_nm: float) -> float:
     span = max(config.oct.bandwidth_nm, 1e-12)
     relative = (wavelength_nm - config.oct.center_wavelength_nm) / span
@@ -133,6 +137,18 @@ def _separability_nrmse(volume: np.ndarray) -> float:
     approx = axial[:, None, None] * spatial[None, :, :]
     return float(np.sqrt(np.mean((mag - approx) ** 2)))
 
+def _common_path_rci_from_shared_pupil(pupil: np.ndarray, *, pad_factor: int) -> np.ndarray:
+    """Return the scalar common-path RCI field for one shared OCT pupil.
+
+    In the scalar low-NA common-path contract, the illumination and detection
+    pupils are the same objective pupil. Therefore h_RCI = u_i * conj(u_d)
+    collapses algebraically to u * conj(u) for the single propagated pupil.
+    This is the N4 contract: do not reinterpret it as an independent
+    illumination/detection pupil model.
+    """
+    field = fraunhofer_psf_from_pupil(pupil, pad_factor=pad_factor)
+    return field * np.conj(field)
+
 def _through_focus_rci_stack(
     config: SimulationConfig,
     grid,
@@ -143,11 +159,8 @@ def _through_focus_rci_stack(
     field_n = grid.mask.shape[0] * pad_factor
     out = np.empty((len(depth_um), field_n, field_n), dtype=np.complex64)
     for i, z in enumerate(depth_um):
-        pupil_i, _ = _make_oct_pupil(config, grid, wavelength_nm, physical_defocus_um=float(z))
-        pupil_d, _ = _make_oct_pupil(config, grid, wavelength_nm, physical_defocus_um=float(z))
-        ui = fraunhofer_psf_from_pupil(pupil_i, pad_factor=pad_factor)
-        ud = fraunhofer_psf_from_pupil(pupil_d, pad_factor=pad_factor)
-        out[i] = (ui * np.conj(ud)).astype(np.complex64)
+        pupil, _ = _make_oct_pupil(config, grid, wavelength_nm, physical_defocus_um=float(z))
+        out[i] = _common_path_rci_from_shared_pupil(pupil, pad_factor=pad_factor).astype(np.complex64)
     peak = float(np.max(np.abs(out)))
     if peak > 0:
         out = (out / peak).astype(np.complex64)
@@ -221,11 +234,8 @@ def _full_spectral_rci_direct_psf(
         depth_phase_um = float(scatterer_z_um)
         for ki, (k, wl_nm) in enumerate(zip(kgrid.k, kgrid.wavelength_nm)):
             defocus_um = object_depth_um - float(scatterer_z_um)
-            pupil_i, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=defocus_um)
-            pupil_d, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=defocus_um)
-            ui = fraunhofer_psf_from_pupil(pupil_i, pad_factor=pad_factor)
-            ud = fraunhofer_psf_from_pupil(pupil_d, pad_factor=pad_factor)
-            h_rci = ui * np.conj(ud)
+            pupil, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=defocus_um)
+            h_rci = _common_path_rci_from_shared_pupil(pupil, pad_factor=pad_factor)
             sampled_h_rci[zi, ki] = h_rci.astype(np.complex64)
             phase = np.exp(1j * 2.0 * float(k) * depth_phase_um)
             spectral[ki] = h_rci * spectral_weight[ki] * phase
@@ -267,6 +277,8 @@ def _full_spectral_rci_direct_psf(
         "dispersion_phase_rad": dispersion.astype(np.float64),
         "phase_sign": "+exp(i 2 k scatterer_z)",
         "depth_phase_origin_um": np.array(scatterer_z_um, dtype=np.float64),
+        "common_path_pupil_identity": np.array(True, dtype=np.bool_),
+        "common_path_pupil_identity_contract": COMMON_PATH_PUPIL_IDENTITY_CONTRACT,
         "normalization": "h_RCI is stored before source/window/dispersion/depth phase; reconstructed PSF is globally peak normalized after optional depth interpolation",
         "model_contract": "low-resolution full spectral RCI direct PSF from h_RCI(x,y,z;k), source spectrum, fixed scatterer-depth phase, measured k linearization, dispersion phase, and k-space FFT reconstruction",
         **profiles,
@@ -295,14 +307,11 @@ def simulate_oct_raw_direct(
     scatter_amp = sample_scattering_amplitude(config, kgrid.wavelength_nm)
 
     for i, (k, wl_nm, s, phi) in enumerate(zip(kgrid.k, kgrid.wavelength_nm, kgrid.source_spectrum, dispersion)):
-        Pi, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=scatterer_z_um)
-        Pd, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=scatterer_z_um)
-        ui = fraunhofer_psf_from_pupil(Pi, pad_factor=1)
-        ud = fraunhofer_psf_from_pupil(Pd, pad_factor=1)
+        pupil, _ = _make_oct_pupil(config, grid, wl_nm, physical_defocus_um=scatterer_z_um)
         dx_um = lateral_sample_pitch_um(wl_nm * 1e-3, config.objective.NA_nominal, pad_factor=1)
         h_rci_sample[i] = _sample_scatterer_rci(
             config,
-            ui * np.conj(ud),
+            _common_path_rci_from_shared_pupil(pupil, pad_factor=1),
             float(k),
             scatterer_x_um,
             scatterer_y_um,
@@ -345,6 +354,8 @@ def simulate_oct_raw_direct(
         "measurement_path": config.sample.measurement_path,
         "sample_scattering_amplitude": scatter_amp.astype(np.complex128),
         "h_rci_sample": h_rci_sample.astype(np.complex128),
+        "common_path_pupil_identity": np.array(True, dtype=np.bool_),
+        "common_path_pupil_identity_contract": COMMON_PATH_PUPIL_IDENTITY_CONTRACT,
         "dichroic_path": "oct_reflection",
         "dichroic_s_amplitude": np.array(center_coeffs.s_amplitude, dtype=np.float64),
         "dichroic_p_amplitude": np.array(center_coeffs.p_amplitude, dtype=np.float64),
@@ -370,12 +381,9 @@ def simulate_oct_psf_direct(
     rci_stack = np.empty((len(kgrid.k), field_n, field_n), dtype=np.complex64)
 
     for i, (k, wl_nm) in enumerate(zip(kgrid.k, kgrid.wavelength_nm)):
-        pupil_i, _ = _make_oct_pupil(config, grid, wl_nm)
-        pupil_d, _ = _make_oct_pupil(config, grid, wl_nm)
-        ui = fraunhofer_psf_from_pupil(pupil_i, pad_factor=pad_factor)
-        ud = fraunhofer_psf_from_pupil(pupil_d, pad_factor=pad_factor)
+        pupil, _ = _make_oct_pupil(config, grid, wl_nm)
         phase = np.exp(1j * 2 * k * scatterer_z_um)
-        rci_stack[i] = (ui * np.conj(ud) * phase).astype(np.complex64)
+        rci_stack[i] = (_common_path_rci_from_shared_pupil(pupil, pad_factor=pad_factor) * phase).astype(np.complex64)
 
     rolloff = _rolloff_amplitude(config, scatterer_z_um)
     dispersion = differential_dispersion_phase(config, kgrid.k)
@@ -430,6 +438,8 @@ def simulate_oct_psf_direct(
         "rci_through_focus": rci_through_focus.astype(np.complex64),
         "separability_nrmse": np.array(_separability_nrmse(psf), dtype=np.float64),
         "full_spectral_rci": np.array(full_spectral_rci, dtype=np.bool_),
+        "common_path_pupil_identity": np.array(True, dtype=np.bool_),
+        "common_path_pupil_identity_contract": COMMON_PATH_PUPIL_IDENTITY_CONTRACT,
         "depth_um": depth_um,
         "x_um": centered_axis_um(field_n, dx_um),
         "y_um": centered_axis_um(field_n, dx_um),
@@ -460,6 +470,8 @@ def simulate_oct_psf_direct(
         result["spectral_rci_axial_profile_integrated"] = spectral_rci_meta["axial_profile_integrated"]
         result["spectral_rci_phase_sign"] = spectral_rci_meta["phase_sign"]
         result["spectral_rci_depth_phase_origin_um"] = spectral_rci_meta["depth_phase_origin_um"]
+        result["spectral_rci_common_path_pupil_identity"] = spectral_rci_meta["common_path_pupil_identity"]
+        result["spectral_rci_common_path_pupil_identity_contract"] = spectral_rci_meta["common_path_pupil_identity_contract"]
         result["spectral_rci_normalization"] = spectral_rci_meta["normalization"]
         result["spectral_rci_model_contract"] = spectral_rci_meta["model_contract"]
         result["full_spectral_rci_depth_decimation"] = spectral_rci_meta["depth_decimation"]
