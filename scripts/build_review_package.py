@@ -1,15 +1,22 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import shutil
 import subprocess
 import sys
+import zipfile
 from datetime import datetime
 from pathlib import Path
+from xml.sax.saxutils import escape
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.plot_round4_axial_lines import generate_round4_axial_line_plots
 
 EXCLUDE_DIRS = {
     "__pycache__",
@@ -170,6 +177,221 @@ def _write_changelog(path: Path) -> None:
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
+def _docx_paragraph(text: str, style: str | None = None) -> str:
+    style_xml = f'<w:pPr><w:pStyle w:val="{style}"/></w:pPr>' if style else ""
+    preserve = ' xml:space="preserve"' if text.startswith(" ") or text.endswith(" ") else ""
+    return f"<w:p>{style_xml}<w:r><w:t{preserve}>{escape(text)}</w:t></w:r></w:p>"
+
+def _docx_table(rows: list[list[str]]) -> str:
+    row_xml = []
+    for row in rows:
+        cells = "".join(
+            "<w:tc><w:tcPr><w:tcW w:w=\"3000\" w:type=\"dxa\"/></w:tcPr>"
+            f"{_docx_paragraph(cell)}</w:tc>"
+            for cell in row
+        )
+        row_xml.append(f"<w:tr>{cells}</w:tr>")
+    return (
+        "<w:tbl><w:tblPr><w:tblW w:w=\"0\" w:type=\"auto\"/>"
+        "<w:tblBorders>"
+        "<w:top w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "<w:left w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "<w:bottom w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "<w:right w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "<w:insideH w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "<w:insideV w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"auto\"/>"
+        "</w:tblBorders></w:tblPr>"
+        + "".join(row_xml)
+        + "</w:tbl>"
+    )
+
+def _write_minimal_docx(path: Path, body_xml: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    document_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        f"<w:body>{body_xml}<w:sectPr><w:pgSz w:w=\"12240\" w:h=\"15840\"/>"
+        "<w:pgMar w:top=\"720\" w:right=\"720\" w:bottom=\"720\" w:left=\"720\" "
+        "w:header=\"360\" w:footer=\"360\" w:gutter=\"0\"/></w:sectPr></w:body></w:document>"
+    )
+    styles_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/>'
+        '<w:rPr><w:sz w:val="21"/></w:rPr></w:style>'
+        '<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/>'
+        '<w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:style>'
+        '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/>'
+        '<w:rPr><w:b/><w:sz w:val="26"/></w:rPr></w:style>'
+        '<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/>'
+        '<w:rPr><w:b/><w:sz w:val="23"/></w:rPr></w:style>'
+        "</w:styles>"
+    )
+    content_types = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+        '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>'
+        '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
+        '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'
+        "</Types>"
+    )
+    rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+        "</Relationships>"
+    )
+    document_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>'
+    )
+    core = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" '
+        'xmlns:dc="http://purl.org/dc/elements/1.1/" '
+        'xmlns:dcterms="http://purl.org/dc/terms/" '
+        'xmlns:dcmitype="http://purl.org/dc/dcmitype/" '
+        'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+        "<dc:title>Round-4 Response Package</dc:title>"
+        "<dc:creator>Codex</dc:creator>"
+        "</cp:coreProperties>"
+    )
+    app = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" '
+        'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
+        "<Application>Codex OOXML builder</Application></Properties>"
+    )
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("[Content_Types].xml", content_types)
+        zf.writestr("_rels/.rels", rels)
+        zf.writestr("word/_rels/document.xml.rels", document_rels)
+        zf.writestr("word/document.xml", document_xml)
+        zf.writestr("word/styles.xml", styles_xml)
+        zf.writestr("docProps/core.xml", core)
+        zf.writestr("docProps/app.xml", app)
+
+def _read_first_direct_model_row(validation_dir: Path) -> dict[str, str]:
+    path = validation_dir / "metrics" / "direct_model_comparison.csv"
+    if not path.exists():
+        return {}
+    with path.open(newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    return rows[0] if rows else {}
+
+def _write_round4_response_docx(path: Path, *, validation_dir: Path, summary: dict, plot_manifest: dict) -> None:
+    row = _read_first_direct_model_row(validation_dir)
+    checks = summary.get("checks", {})
+    verdict = summary.get("verdict", {})
+    run_url = "https://github.com/dongfanghong656/MIESIM/actions"
+    changelog_rows = [
+        ["PRO Round 3 P0", "Round 4/Round 5 response", "Evidence"],
+        ["Defocus unit conflation", "Physical-z and Zernike-OPD paths separated", "PHYSICS_CONTRACT.md; oct_forward.py; propagation.py"],
+        ["Hybrid as truth", "full_spectral_rci remains default; hybrid is opt-in", "config_schema.py; validation_summary.json"],
+        ["Pass-gate semantics", "all_pass/pilot_pass/review_required gates wired to blockers", "validation.py; validation_summary.json"],
+        ["Config relative paths", "config paths resolve from config directory and project root", "config_schema.py"],
+        ["Central-lobe/on-axis FWHM", "metrics and validation gates report central/on-axis behavior", "metrics.py; validation.py"],
+        ["Round 5 V-gates", "Strehl, differential dispersion, rolloff, and propagated-reflector phase stability added", "validation_summary.json checks"],
+    ]
+    plot_names = [
+        Path(item["path"]).name
+        for item in plot_manifest.get("plots", [])
+        if isinstance(item, dict) and "path" in item
+    ]
+    paragraphs = [
+        _docx_paragraph("Round-4 Response for PRO Sign-off", "Title"),
+        _docx_paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d')}"),
+        _docx_paragraph(f"Version: { _git_value(['rev-parse', '--short', 'HEAD']) }"),
+        _docx_paragraph("Scope: scalar low-NA common-path microscope/OCT validation harness. This is not a final vector-Debye, Mie, Zemax, or FDTD truth simulator."),
+        _docx_paragraph("1. Changelog", "Heading1"),
+        _docx_table(changelog_rows),
+        _docx_paragraph("2. P0-by-P0 response", "Heading1"),
+        _docx_paragraph("P0-1 defocus: physical sample displacement now propagates through the low-NA physical defocus phase, while objective.defocus_um remains a Zernike OPD coefficient."),
+        _docx_paragraph("P0-2 hybrid truth: the default direct model is full_spectral_rci; hybrid_rci is retained as an explicit diagnostic surrogate and is guarded by faithfulness tests."),
+        _docx_paragraph("P0-3 pass gates: pilot_pass is now tied to all_pass and blocker_count, with unmet_requirements reported instead of hidden."),
+        _docx_paragraph("P0-4 config paths: calibration and config-relative paths are resolved deterministically for clean checkout reproduction."),
+        _docx_paragraph("P0-5 FWHM metrics: central-lobe, on-axis, and integrated axial metrics are reported to avoid mirror-peak or off-axis masking."),
+        _docx_paragraph("Round 5 closeout: Strehl, differential dispersion, sensitivity rolloff, propagated-reflector phase stability, and N4 common-path pupil identity are now explicit contracts."),
+        _docx_paragraph("3. Axial-line plots", "Heading1"),
+        _docx_paragraph("Generated on-axis axial magnitude plots are included as sibling PNG evidence in evidence/round4_axial_lines/."),
+        *[_docx_paragraph(f"- {name}") for name in plot_names],
+        _docx_paragraph("4. Faithfulness number", "Heading1"),
+        _docx_paragraph(
+            "CI artifact direct_model_comparison.csv reports "
+            f"axial_fwhm_relative_error = {row.get('axial_fwhm_relative_error', 'unknown')}, "
+            f"nrmse_3d = {row.get('nrmse_3d', 'unknown')}, "
+            f"full_spectral_rci_interpolated = {row.get('full_spectral_rci_interpolated', 'unknown')}."
+        ),
+        _docx_paragraph(f"Validation verdict: pilot_pass = {verdict.get('pilot_pass', 'unknown')}; blocker_count = {verdict.get('blocker_count', 'unknown')}."),
+        _docx_paragraph("5. T1.3 finding", "Heading1"),
+        _docx_paragraph("The scalar low-NA hybrid_rci path is treated as a faithful diagnostic surrogate only within the pinned low-NA regime. It is not the default truth model and not a claim about high-NA vector or particle-scattering truth."),
+        _docx_paragraph("6. V-gate evidence", "Heading1"),
+        _docx_paragraph(f"strehl_v_gate pass = {checks.get('strehl_v_gate', {}).get('pass', 'unknown')}; sensitivity_rolloff_v_gate pass = {checks.get('sensitivity_rolloff_v_gate', {}).get('pass', 'unknown')}; phase_stability_v_gate pass = {checks.get('phase_stability_v_gate', {}).get('pass', 'unknown')}."),
+        _docx_paragraph(f"CI evidence root: {run_url}. The response package also includes copied validation_summary.json, direct_model_comparison.csv, and plot manifest files."),
+    ]
+    _write_minimal_docx(path, "".join(paragraphs))
+
+def build_round4_response_package(
+    *,
+    validation_dir: Path | None,
+    logs_dir: Path | None,
+    output_root: Path,
+    config_path: Path,
+) -> tuple[Path, Path]:
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    package_dir = output_root / f"round4_response_{stamp}"
+    if package_dir.exists():
+        shutil.rmtree(package_dir)
+    package_dir.mkdir(parents=True)
+
+    validation_dir = (validation_dir or _latest_validation_dir(PROJECT_ROOT / "outputs")).resolve()
+    logs_dir = logs_dir.resolve() if logs_dir else PROJECT_ROOT / "logs"
+    evidence_dir = package_dir / "evidence"
+    evidence_dir.mkdir()
+
+    validation_target = evidence_dir / "validation" / validation_dir.name
+    _copytree(validation_dir, validation_target)
+    for relative in [
+        Path("metrics") / "validation_summary.json",
+        Path("metrics") / "direct_model_comparison.csv",
+        Path("metrics") / "direct_model_axial_profiles.csv",
+    ]:
+        _copy_if_exists(validation_dir / relative, evidence_dir / relative)
+
+    plots_dir = evidence_dir / "round4_axial_lines"
+    plot_manifest = generate_round4_axial_line_plots(
+        config_path=config_path,
+        output_root=plots_dir,
+        N=24,
+        k_samples=64,
+        pad_factor=1,
+    )
+
+    logs_target = evidence_dir / "logs"
+    logs_target.mkdir()
+    for name in ["pytest.log", "run_validation.log"]:
+        _copy_if_exists(logs_dir / name, logs_target / name)
+
+    summary = _read_summary(validation_dir)
+    _write_round4_response_docx(package_dir / "response.docx", validation_dir=validation_dir, summary=summary, plot_manifest=plot_manifest)
+    meta = {
+        "package_name": package_dir.name,
+        "created_at": stamp,
+        "round": 4,
+        "git_commit": _git_value(["rev-parse", "HEAD"]),
+        "git_status_short": _project_git_status_short(),
+        "validation_dir": str(validation_dir),
+        "response_docx": str(package_dir / "response.docx"),
+        "plot_manifest": str(plots_dir / "round4_axial_lines_manifest.json"),
+    }
+    (package_dir / "package_manifest.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    _write_sha256sums(package_dir)
+    zip_path = Path(shutil.make_archive(str(package_dir), "zip", root_dir=output_root, base_dir=package_dir.name))
+    return package_dir, zip_path
+
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -243,13 +465,23 @@ def build_package(validation_dir: Path | None, logs_dir: Path | None, output_roo
     return package_dir, zip_path
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build Round3 response review package.")
+    parser = argparse.ArgumentParser(description="Build response review package.")
+    parser.add_argument("--round", type=int, choices=[3, 4], default=3)
     parser.add_argument("--validation-dir", type=Path, default=None)
     parser.add_argument("--logs-dir", type=Path, default=PROJECT_ROOT / "logs")
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "review_packages")
+    parser.add_argument("--config", type=Path, default=PROJECT_ROOT / "configs" / "config_minimal.yaml")
     args = parser.parse_args()
 
-    package_dir, zip_path = build_package(args.validation_dir, args.logs_dir, args.output_root)
+    if args.round == 4:
+        package_dir, zip_path = build_round4_response_package(
+            validation_dir=args.validation_dir,
+            logs_dir=args.logs_dir,
+            output_root=args.output_root,
+            config_path=args.config,
+        )
+    else:
+        package_dir, zip_path = build_package(args.validation_dir, args.logs_dir, args.output_root)
     print(json.dumps({"package_dir": str(package_dir), "zip_path": str(zip_path)}, ensure_ascii=False))
     return 0
 

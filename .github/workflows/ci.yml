@@ -59,6 +59,10 @@ jobs:
             --config configs/config_full_spectral_rci_production_smoke.yaml \
             --strict-pass
 
+      - name: Build round4 response package
+        run: |
+          python scripts/build_review_package.py --round 4
+
       - name: Upload validation outputs
         if: always()
         uses: actions/upload-artifact@v4
@@ -68,5 +72,18 @@ jobs:
             outputs/**/validation_summary.json
             outputs/**/direct_model_comparison.csv
             outputs/**/verdict.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload round4 response package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: round4-response-package-py${{ matrix.python-version }}
+          path: |
+            review_packages/round4_response_*/response.docx
+            review_packages/round4_response_*/package_manifest.json
+            review_packages/round4_response_*/SHA256SUMS.txt
+            review_packages/round4_response_*/evidence/**
           if-no-files-found: warn
           retention-days: 14

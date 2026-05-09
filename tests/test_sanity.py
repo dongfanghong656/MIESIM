@@ -1,7 +1,9 @@
 from dataclasses import replace
+import json
 from pathlib import Path
 import shutil
 import uuid
+import zipfile
 
 import h5py
 import numpy as np
@@ -44,6 +46,7 @@ from cop_oct_sim.validation import (
     parseval_sanity,
     run_validation_suite,
 )
+from scripts.build_review_package import _write_round4_response_docx
 from cop_oct_sim.metrics import (
     axial_fwhm,
     central_lobe_fwhm_1d,
@@ -527,6 +530,50 @@ def test_full_spectral_rci_reports_common_path_pupil_identity_contract():
     assert direct["common_path_pupil_identity_contract"] == COMMON_PATH_PUPIL_IDENTITY_CONTRACT
     assert bool(direct["spectral_rci_common_path_pupil_identity"])
     assert direct["spectral_rci_common_path_pupil_identity_contract"] == COMMON_PATH_PUPIL_IDENTITY_CONTRACT
+
+def test_round4_response_docx_writer_creates_valid_docx():
+    work = Path.cwd() / ".test-output" / f"pytest-round4-response-{uuid.uuid4().hex}"
+    try:
+        validation_dir = work / "validation_20260509_000000"
+        metrics_dir = validation_dir / "metrics"
+        metrics_dir.mkdir(parents=True)
+        (metrics_dir / "validation_summary.json").write_text(
+            json.dumps(
+                {
+                    "checks": {
+                        "strehl_v_gate": {"pass": True},
+                        "sensitivity_rolloff_v_gate": {"pass": True},
+                        "phase_stability_v_gate": {"pass": True},
+                    },
+                    "verdict": {"pilot_pass": True, "blocker_count": 0},
+                }
+            ),
+            encoding="utf-8",
+        )
+        (metrics_dir / "direct_model_comparison.csv").write_text(
+            "axial_fwhm_relative_error,nrmse_3d,full_spectral_rci_interpolated\n"
+            "7.232718201331539e-05,3.851839665003354e-06,False\n",
+            encoding="utf-8",
+        )
+        out = work / "response.docx"
+
+        _write_round4_response_docx(
+            out,
+            validation_dir=validation_dir,
+            summary=json.loads((metrics_dir / "validation_summary.json").read_text()),
+            plot_manifest={"plots": [{"path": "round4_axial_line_z_0um.png"}]},
+        )
+
+        assert out.exists()
+        with zipfile.ZipFile(out) as zf:
+            names = set(zf.namelist())
+            assert "[Content_Types].xml" in names
+            assert "word/document.xml" in names
+            document_xml = zf.read("word/document.xml").decode("utf-8")
+        assert "Round-4 Response for PRO Sign-off" in document_xml
+        assert "7.232718201331539e-05" in document_xml
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
 
 def test_central_lobe_fwhm_ignores_mirror_peak():
     profile = np.zeros(101, dtype=float)
