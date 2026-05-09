@@ -28,6 +28,18 @@ phase(rho) = pi * z_um * NA^2 * rho^2 / wavelength_um
 - The full-spectral review artifact stores sampled complex `h_RCI[depth,k,y,x]`, true/measured/linearized k grids, wavelength grid, source spectrum, window vector, dispersion phase, fixed scatterer-depth phase origin, and normalized max/on-axis/integrated axial profiles.
 - Neither path is vector Debye, Zemax POP, FDTD, or an internal Mie-scattering truth model.
 
+## Strehl V-Gate
+
+- `checks["strehl_v_gate"]` is a focus-quality validation gate for this normalized simulation harness, not an absolute calibrated optical Strehl measurement.
+- The direct PSF volumes returned by the current forward model are already globally peak-normalized. A literal "peak-normalize then read the peak voxel" formula would therefore make heavy defocus appear artificially perfect.
+- To keep the gate sensitive to focus loss while remaining scale-invariant, `strehl_ratio(psf_actual, psf_ideal)` normalizes each intensity volume by integrated intensity and compares the center voxel:
+
+```text
+strehl = (I_actual(center) / sum(I_actual)) / (I_ideal(center) / sum(I_ideal))
+```
+
+- Validation summaries record this convention as `strehl_normalization = "integrated_intensity"`.
+
 ## Common-Path Dispersion
 
 - Common-path OCT does not retain a physically meaningful absolute quadratic spectral phase when the sample and reference arms share the same dispersive path.
@@ -41,7 +53,7 @@ xi(k) = 2 * (k - mean(k)) / (max(k) - min(k))
 - `errors.dispersion_quadratic_rad` is the sample-arm quadratic coefficient.
 - `errors.reference_dispersion_quadratic_rad` is the reference-arm quadratic coefficient.
 - If the two coefficients are equal, the common-path quadratic dispersion contribution cancels to numerical zero.
-- `absolute_dispersion_phase(...)` exists only for diagnostics; direct OCT field assembly uses `differential_dispersion_phase(...)`.
+- `absolute_dispersion_phase(...)` exists only for diagnostics; OCT raw/direct field assembly and the corresponding theory-conversion helper use `differential_dispersion_phase(...)`.
 
 ## Sensitivity Roll-Off
 
