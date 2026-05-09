@@ -18,3 +18,24 @@
 
 ### Open items carried forward
 - None for T5.1. If PRO requires the literal peak-normalized Strehl formula, the direct PSF pipeline must expose an unnormalized PSF or center-intensity metadata; using the already peak-normalized returned PSF is mathematically insensitive to defocus.
+
+## T5.2 — Differential dispersion in common-path (2026-05-09, SHA 5544a37)
+
+### What changed
+- `cop_oct_sim/spectrometer.py:111` renames the absolute sample-arm quadratic phase helper to `absolute_dispersion_phase(...)`.
+- `cop_oct_sim/spectrometer.py:115` adds `differential_dispersion_phase(...)`, using `(dispersion_quadratic_rad - reference_dispersion_quadratic_rad) * xi(k)^2`.
+- `cop_oct_sim/config_schema.py:89` adds `ErrorConfig.reference_dispersion_quadratic_rad = 0.0`.
+- `cop_oct_sim/oct_forward.py:293` and `cop_oct_sim/oct_forward.py:381` switch direct OCT field assembly to `differential_dispersion_phase(...)`.
+- `cop_oct_sim/theory_conversion.py:62` switches the predicted axial gate to the same differential phase convention.
+- `PHYSICS_CONTRACT.md:31` documents the common-path dispersion identity and the sample/reference mismatch definition.
+- `tests/test_sanity.py:521` and `tests/test_sanity.py:535` add the cancellation and mismatch-broadening tests.
+
+### Verification
+- Local full pytest: `python -m pytest tests/test_sanity.py -q` -> 44 passed.
+- Local mismatch check: clean axial FWHM = 7.332735312545693 um; mismatch axial FWHM = 8.453789106279611 um; broadening ratio = 1.152883439255729.
+- CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/25603263330 — success.
+- CI artifact `validation-outputs-py3.11` includes two `validation_summary.json` files with `verdict.pilot_pass = true` and `checks.strehl_v_gate.pass = true`.
+- CI `direct_model_comparison.csv` retains the Round-4 faithfulness floor: `axial_fwhm_relative_error = 7.232718201331539e-05`, `nrmse_3d = 3.851839665003354e-06`, `full_spectral_rci_interpolated = False`.
+
+### Open items carried forward
+- None for T5.2.
