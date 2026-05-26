@@ -20,7 +20,7 @@ from cop_oct_sim.oct_forward import (
 )
 from cop_oct_sim.pipelines import run_minimal
 from cop_oct_sim.propagation import fraunhofer_psf_from_pupil, physical_defocus_phase, propagation_energy_ratio, simple_defocus_stack
-from cop_oct_sim.pupil import build_shared_pupil
+from cop_oct_sim.pupil import build_shared_pupil, clear_circular_pupil
 from cop_oct_sim.reconstruction import reconstruct_sd_oct
 from cop_oct_sim.scatterers import sample_scattering_amplitude
 from cop_oct_sim.spectrometer import (
@@ -50,6 +50,7 @@ from scripts.build_review_package import _write_round4_response_docx
 from cop_oct_sim.metrics import (
     axial_fwhm,
     central_lobe_fwhm_1d,
+    compare_psf_volumes,
     lateral_fwhm_from_volume,
     nrmse,
     normalize,
@@ -510,6 +511,36 @@ def test_physical_defocus_small_z_keeps_on_axis_rci_reasonable():
 
     assert ratio > 0.5
 
+def test_physical_defocus_strehl_matches_paraxial_within_5pct():
+    """V0.1 acceptance: physical-defocus Strehl drop matches Marechal theory.
+
+    Contract anchor: PHYSICS_CONTRACT.md Defocus
+    (phase = pi * z * NA^2 * rho^2 / wavelength).
+    """
+    NA = 0.05
+    wavelength_um = 0.850
+    z_um = 2.5
+    grid = make_pupil_grid(256, NA)
+    pupil = clear_circular_pupil(grid)
+
+    focused = fraunhofer_psf_from_pupil(pupil, normalize=False, pad_factor=4)
+    defocused = fraunhofer_psf_from_pupil(
+        pupil * physical_defocus_phase(grid, z_um=z_um, wavelength_um=wavelength_um, NA=NA),
+        normalize=False,
+        pad_factor=4,
+    )
+
+    strehl_observed = float(np.max(np.abs(defocused) ** 2) / np.max(np.abs(focused) ** 2))
+    A_waves = z_um * NA**2 / (2.0 * wavelength_um)
+    strehl_paraxial = 1.0 - (np.pi**2) * A_waves**2 / 3.0
+    rel_err = abs(strehl_observed - strehl_paraxial) / strehl_paraxial
+
+    print(
+        "V0.1 physical defocus Strehl: "
+        f"observed={strehl_observed:.8f}, paraxial={strehl_paraxial:.8f}, rel_err={rel_err:.3e}"
+    )
+    assert rel_err <= 0.05
+
 def test_common_path_rci_collapses_identical_incident_detection_pupils():
     grid = make_pupil_grid(32, 0.18)
     pupil = build_shared_pupil(grid, 0.85, fill_ratio=0.82, defocus_um=0.1)
@@ -823,6 +854,48 @@ def test_direct_model_comparison_rows_compare_hybrid_and_full_spectral():
     assert float(row["axial_fwhm_relative_error"]) <= 0.25
     assert row["status"] == "diagnostic"
     assert row["pass"] is True
+
+def test_direct_model_comparison_fails_on_fwhm_mismatch_even_when_nrmse_is_low():
+    """V0.3 acceptance: on-axis FWHM mismatch blocks low-NRMSE cases.
+
+    Contract anchor: PHYSICS_CONTRACT.md FWHM Metrics + Gate Semantics.
+    """
+    sigma_xy = 1.0
+    sigma_z = 1.0
+    half_extent = 10.0
+    spacing = 0.5
+    coords = np.arange(-half_extent, half_extent + 0.5 * spacing, spacing)
+    Z, Y, X = np.meshgrid(coords, coords, coords, indexing="ij")
+    lateral = np.exp(-(X**2 + Y**2) / (2.0 * sigma_xy**2))
+    axial_narrow = np.exp(-(coords**2) / (2.0 * sigma_z**2))
+    axial_wide = np.exp(-(coords**2) / (2.0 * (3.0 * sigma_z) ** 2))
+
+    full_spectral = lateral * axial_narrow[:, None, None]
+    hybrid = lateral * axial_wide[:, None, None]
+    cmp = compare_psf_volumes(full_spectral, hybrid, coords, spacing)
+
+    nrmse_3d = float(cmp["nrmse_3d"])
+    full_fwhm = float(cmp["fwhm_ax_on_axis_direct_um"])
+    hybrid_fwhm = float(cmp["fwhm_ax_on_axis_converted_um"])
+    axial_rel_error = abs(full_fwhm - hybrid_fwhm) / max(abs(full_fwhm), 1e-12)
+    lateral_rel_error = abs(float(cmp["fwhm_lat_direct_um"]) - float(cmp["fwhm_lat_converted_um"])) / max(
+        abs(float(cmp["fwhm_lat_direct_um"])),
+        1e-12,
+    )
+    pass_gate = (
+        np.isfinite(nrmse_3d)
+        and np.isfinite(axial_rel_error)
+        and np.isfinite(lateral_rel_error)
+        and axial_rel_error <= 0.25
+        and lateral_rel_error <= 0.25
+    )
+
+    assert nrmse_3d < 0.05
+    assert 2.2 <= full_fwhm <= 2.5
+    assert 6.8 <= hybrid_fwhm <= 7.3
+    assert axial_rel_error >= 1.5
+    assert lateral_rel_error < 1e-12
+    assert not pass_gate, "V0.3 violation: gate accepted a low-NRMSE case with 3x axial FWHM mismatch"
 
 def test_direct_model_axial_profile_rows_report_hybrid_and_full_spectral_profiles():
     base = small_config()
