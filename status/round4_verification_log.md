@@ -274,3 +274,137 @@ The companion `test_pilot_pass_false_when_review_required` (decimation=3) still 
 - T1.3: dedicated negative test that injects low-NA aberration and asserts hybrid vs full_spectral disagree >25% → blocker fires.
 - N4 (Round 5 ticket): `oct_forward.py:_full_spectral_rci_direct_psf:224-225` — `pupil_i` and `pupil_d` use identical params; document in PHYSICS_CONTRACT.md or refactor.
 - V-gate completeness: Strehl ratio gate; differential dispersion in common-path; sensitivity roll-off vs spec depth-of-focus.
+
+## Phase 2 closeout (2026-05-08)
+
+### Real T1.1 code fix (the prior log entry was incomplete)
+
+`cop_oct_sim/validation.py:358` and `:451` — `max(int(config.oct.full_spectral_rci_depth_decimation), 3)` → `max(..., 1)`. The prior round-4 entry claimed this was already fixed in line 356, but that line was actually `_path_e_gate` axial_error wiring (an N2 change). The hardcoded `3` floor inside `build_direct_model_comparison_rows` and `build_direct_model_axial_profile_rows` was still in place, silently coercing every comparison to decimation=3 and triggering `_interpolate_complex_stack` regardless of config. CI was green only because:
+
+- `unmet_requirements` (N1) reads `config.oct.full_spectral_rci_depth_decimation` directly, not the local clamped variable
+- The production smoke config had its decimation flipped to 1 in the previous CI cycle
+
+After the real T1.1 fix, the production smoke `direct_model_comparison.csv` shows:
+
+| Field | Pre-fix (run 25548882884, fad0465) | Post-fix (run 25555010839, c1a4d94) |
+|---|---|---|
+| `full_spectral_rci_depth_decimation` | 3 (silently clamped) | 1 (config-honored) |
+| `full_spectral_rci_interpolated` | True | **False** |
+| `computed_depth_count / depth_count` | 13 / 32 | **32 / 32** |
+| `axial_fwhm_relative_error` (on-axis) | 0.0835 | **7.2e-5** |
+| `nrmse_3d` | 0.004 | **3.85e-6** |
+
+The 0.0835 axial relative error in run 25548882884 was *not* the production-resolution result; it was an artifact of full-spectral being computed at decimation=3 and then interpolated. With the real T1.1 fix, hybrid and full-spectral agree to numerical precision at decimation=1 in the unaberrated low-NA regime, which empirically confirms PRO 01's claim that the separable hybrid is faithful in scalar low-NA.
+
+### T1.2 — hybrid demoted from default truth
+
+`cop_oct_sim/config_schema.py:24` — `OCTConfig.direct_psf_model` default `"hybrid_rci" → "full_spectral_rci"`. Hybrid is still selectable by explicit `direct_psf_model: hybrid_rci` in YAML (the four legacy configs preserve this for backwards compatibility), but any code that constructs a `SimulationConfig()` without overriding the field now gets full-spectral truth. This is the structural defense against PRO P0 #2 ("hybrid as truth").
+
+`comparison_name`: `"hybrid_vs_full_spectral_rci_lowres" → "hybrid_vs_full_spectral_rci"` (with decimation=1 the row is no longer a low-resolution diagnostic).
+
+### T1.3 — faithfulness pin (reframed from negative test)
+
+Original plan: assert hybrid and full diverge under aberration, to guard against regressions that "make hybrid look like full".
+
+Empirical finding from CI: at NA=0.25, λ=850 nm, even under stressed conditions
+(bandwidth=200 nm, defocus=1 µm, Z4 OPD=0.30 µm, dispersion_quadratic_rad=8.0 rad)
+the on-axis axial relative error stays ≤1%. The scalar low-NA hybrid IS a
+faithful surrogate of the per-k full-spectral sum, exactly as PRO 01 claimed.
+
+A "negative" test that forces them to disagree would either leave the scalar
+low-NA regime (out of scope) or introduce a numerical artifact rather than a
+physics-based discriminator. So T1.3 was reframed as a **positive faithfulness
+pin**: `tests/test_sanity.py::test_hybrid_is_faithful_to_full_spectral_in_scalar_low_na_regime`
+asserts axial and lateral relative error stay ≤10% under wide-bandwidth +
+finite-defocus stress. This guards against regressions that *break* hybrid
+or change the scalar low-NA approximation in ways that exit its validity
+regime.
+
+### CI run sequence for Phase 2
+
+| Run | SHA | Result | First failure |
+|---|---|---|---|
+| 25553630678 | 5cf509b | FAIL | comparison_name rename broke a stale assertion; T1.3 (negative form) couldn't reach the threshold |
+| 25554605127 | 7873db2 | FAIL | T1.3 (still in negative form) reached only 0.06%/0.99% |
+| 25555010839 | c1a4d94 | **PASS** | T1.3 reframed as faithfulness pin |
+
+### Phase 2 status
+
+| Task | Status |
+|---|---|
+| T1.1 (real code fix) | ✅ |
+| T1.2 (hybrid demoted from default truth) | ✅ — structural via dataclass default |
+| T1.3 (negative test → faithfulness pin) | ✅ — reframed based on empirical scalar low-NA finding |
+
+### Pending (out of round 4 scope)
+
+- Strehl ratio V-gate (PRO 04).
+- Differential dispersion check in common-path geometry.
+- Sensitivity roll-off vs spec depth-of-focus.
+- N4 Round 5 ticket: `oct_forward.py:_full_spectral_rci_direct_psf:224-225` `pupil_i` and `pupil_d` use identical params; document or refactor.
+
+Round 4 ready for PRO sign-off.
+
+## Phase 0 numerical acceptance closeout (2026-05-27)
+
+This block closes the two Phase 0 acceptance debts identified in
+`status/round5_v2_task_book.md` T5.0.C and T5.0.D. The tests landed in
+commit `8c77fb9` and were verified by GitHub Actions run
+https://github.com/dongfanghong656/MIESIM/actions/runs/26460376175.
+
+### V0.1 numerical Strehl-drop acceptance
+
+`tests/test_sanity.py::test_physical_defocus_strehl_matches_paraxial_within_5pct`
+exercises `physical_defocus_phase` at NA=0.05, wavelength=850 nm, and
+z=2.5 um physical defocus, then compares the observed peak-intensity
+Strehl drop with the Marechal/paraxial reference from
+PHYSICS_CONTRACT.md Defocus:
+
+```text
+observed=0.99995560
+paraxial=0.99995553
+relative_error=7.099e-08
+acceptance_threshold=0.05
+```
+
+This turns the earlier V0.1 file/line inspection into a numerical regression
+guard for the physical-z vs Zernike-OPD split.
+
+### V0.3 synthetic FWHM-mismatch acceptance
+
+`tests/test_sanity.py::test_direct_model_comparison_fails_on_fwhm_mismatch_even_when_nrmse_is_low`
+constructs two separable Gaussian PSF volumes with identical lateral width and
+3x axial FWHM mismatch. The synthetic case preserves low 3D NRMSE while the
+on-axis axial FWHM gate rejects it:
+
+```text
+nrmse_3d=0.029172754477609652
+full_spectral_on_axis_fwhm_um=2.3779315413614484
+hybrid_on_axis_fwhm_um=7.0665342926451125
+axial_fwhm_relative_error=1.9717147738404934
+lateral_fwhm_relative_error=0.0
+pass_gate=False
+```
+
+This proves the direct-model comparison gate cannot regress to an NRMSE-only
+acceptance rule.
+
+### CI and artifact evidence
+
+- CI run: https://github.com/dongfanghong656/MIESIM/actions/runs/26460376175
+- Head SHA: `8c77fb90c2621f2dc73c69bb5f664ccaf9155118`
+- Job: `test (3.11)` -> success.
+- Artifact `validation-outputs-py3.11`: present, 8563 bytes.
+- Artifact `round4-response-package-py3.11`: present, 168853 bytes.
+- Remote `origin/main` now points at `8c77fb90c2621f2dc73c69bb5f664ccaf9155118`.
+
+### Phase 0 acceptance status
+
+| Item | Status | Evidence |
+|---|---|---|
+| V0.1 numerical Strehl-drop vs paraxial formula | PASS | `test_physical_defocus_strehl_matches_paraxial_within_5pct`, CI run 26460376175 |
+| V0.3 low-NRMSE / high-FWHM-mismatch rejection | PASS | `test_direct_model_comparison_fails_on_fwhm_mismatch_even_when_nrmse_is_low`, CI run 26460376175 |
+
+With T5.0.A/T5.6 DOCX package CI already green in run 25606208085 and the
+sync gate now re-verified at `8c77fb9`, the Phase 0 acceptance debt called out
+by the Round 5 v2 task book is closed.
