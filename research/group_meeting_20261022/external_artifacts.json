@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-10-22T13:41:43.941149+00:00",
+  "files": [
+    {
+      "name": "离焦补偿与焦深拓展_组会_v1.pdf",
+      "size_bytes": 1889487,
+      "sha256": "b98135af115cc334fee9b28649f5020d8c980eaea3a3a12c0736b4e0304cc46d",
+      "sync_state": "EXTERNAL_UNSYNCED",
+      "reason": "restricted full deliverable or binary; intentionally excluded from public repository"
+    },
+    {
+      "name": "离焦补偿与焦深拓展_组会_v1.pptx",
+      "size_bytes": 2089913,
+      "sha256": "1547bfb68d16d38a8cc928dcd2078e2e788f08eeef82811c8ddf27560e362c46",
+      "sync_state": "EXTERNAL_UNSYNCED",
+      "reason": "restricted full deliverable or binary; intentionally excluded from public repository"
+    },
+    {
+      "name": "组会讲稿与研究依据.html",
+      "size_bytes": 6133998,
+      "sha256": "cc7d998c2b82e96cbefaeefe689975f37ccae05cae7c7ee504e9555512983c67",
+      "sync_state": "EXTERNAL_UNSYNCED",
+      "reason": "restricted full deliverable or binary; intentionally excluded from public repository"
+    },
+    {
+      "name": "slides_spec.json",
+      "size_bytes": 43512,
+      "sha256": "bcab9a8ede6a75cb68be9fc1e6f041c6a745f534c9a9769d56b0b6cbfb4e2b91",
+      "sync_state": "EXTERNAL_UNSYNCED",
+      "reason": "restricted full deliverable or binary; intentionally excluded from public repository"
+    }
+  ],
+  "note": "Metadata only. Files are not stored in GitHub. Complete private project is delivered separately."
+}

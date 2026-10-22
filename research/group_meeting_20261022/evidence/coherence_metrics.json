@@ -1,0 +1,95 @@
+{
+  "kind": "illustrative_forward_model_validation_not_experimental_OCT",
+  "seed": 20261022,
+  "complex_psf": "exp(-x^2/(2*1.05^2))*exp(1j*0.55*x^2)",
+  "coordinates": "dimensionless arbitrary units",
+  "counterexample": [
+    {
+      "relative_phase_rad": 0.0,
+      "relative_L2_difference_from_amplitude_convolution": 0.13199798127694215,
+      "center_amplitude": 1.5496748577664987,
+      "linear_surrogate_center": 1.5496748577664987
+    },
+    {
+      "relative_phase_rad": 1.5707963267948966,
+      "relative_L2_difference_from_amplitude_convolution": 0.300901222053505,
+      "center_amplitude": 1.0957856005609898,
+      "linear_surrogate_center": 1.5496748577664987
+    },
+    {
+      "relative_phase_rad": 3.141592653589793,
+      "relative_L2_difference_from_amplitude_convolution": 0.5112887531847107,
+      "center_amplitude": 8.326672684688674e-17,
+      "linear_surrogate_center": 1.5496748577664987
+    }
+  ],
+  "ensemble": {
+    "grid_n": 513,
+    "kernel_n": 257,
+    "boundary": "linear zero-padded convolution, cropped same",
+    "normalization": "sum |h|^2 = 1",
+    "assumptions": [
+      "proper circular complex Gaussian scatterers",
+      "zero mean",
+      "independent scatterer coefficients with known position-dependent variance",
+      "independent looks",
+      "same complex PSF in every look",
+      "no measurement noise"
+    ],
+    "target_identity": "E|H eta|^2 = |H|^2 v",
+    "convergence": [
+      {
+        "independent_looks": 1,
+        "relative_L2_intensity_error": 0.6891407361107427,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.4512136822322374
+      },
+      {
+        "independent_looks": 4,
+        "relative_L2_intensity_error": 0.6048873012842468,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.37693601505751767
+      },
+      {
+        "independent_looks": 16,
+        "relative_L2_intensity_error": 0.3203094079192281,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.18304005941198448
+      },
+      {
+        "independent_looks": 64,
+        "relative_L2_intensity_error": 0.13326031539124342,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.06312772504756284
+      },
+      {
+        "independent_looks": 256,
+        "relative_L2_intensity_error": 0.04578539684191033,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.025194859438403692
+      },
+      {
+        "independent_looks": 1024,
+        "relative_L2_intensity_error": 0.03018122945653892,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.017552702557493013
+      },
+      {
+        "independent_looks": 4096,
+        "relative_L2_intensity_error": 0.011649045267297063,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.008298322894993328
+      },
+      {
+        "independent_looks": 16384,
+        "relative_L2_intensity_error": 0.007720801402126675,
+        "relative_L2_mean_amplitude_vs_Rayleigh_mean_error": 0.004697692380710252
+      }
+    ],
+    "mean_amplitude_is_not_linear": {
+      "correct_mean": "sqrt(pi)/2 * sqrt(|H|^2 v)",
+      "wrong_mean": "|H| * (sqrt(pi)/2 * sqrt(v))",
+      "relative_L2_wrong_mean_vs_correct_mean": 9.202753701018846
+    }
+  },
+  "warnings": [
+    "All figures are mathematical illustrations, not user measurements.",
+    "Finite-look error is random and need not decrease monotonically for every random seed.",
+    "Independent object microstates are explicitly generated; repeated static-speckle acquisitions do not provide them.",
+    "The intensity identity targets scatterer covariance/power, not an arbitrary deterministic object amplitude.",
+    "Spatially adjacent output pixels remain correlated even when input coefficients are independent."
+  ]
+}

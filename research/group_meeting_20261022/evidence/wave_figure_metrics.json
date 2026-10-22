@@ -1,0 +1,107 @@
+{
+  "kind": "SYNTHETIC; no experimental data",
+  "units": "micrometres",
+  "model": {
+    "pupil": "uniform circular amplitude",
+    "propagation": "scalar exact angular-spectrum defocus",
+    "medium_index": 1.0,
+    "omitted": [
+      "polarization/vector diffraction",
+      "interfaces",
+      "dispersion",
+      "noise except explicitly stated",
+      "sample scattering"
+    ]
+  },
+  "figures": {
+    "wave_01_through_focus": {
+      "lambda_nm": 620,
+      "NA": 0.4,
+      "z_um": [
+        -8,
+        0,
+        8
+      ],
+      "intensity_scale": "common, focus peak=1",
+      "quadrature_order": 400
+    },
+    "wave_02_zernike_modes": {
+      "OPD_RMS_nm": 60,
+      "modes": [
+        "defocus",
+        "astigmatism",
+        "coma",
+        "spherical"
+      ],
+      "normalization": "continuous unit disk RMS=1",
+      "intensity_scale": "all relative to ideal peak"
+    },
+    "wave_03_intensity_coupling": {
+      "defocus_um": 4,
+      "coma_RMS_nm": 60,
+      "relative_L2_error": 0.6544515607733263,
+      "minimum_unphysical_additive_prediction": -0.008701034862356072
+    },
+    "wave_04_wavelength_scaling": {
+      "lambda_nm": [
+        620,
+        930
+      ],
+      "scale": 1.5,
+      "defocus_um": [
+        4.0,
+        6.0
+      ],
+      "relative_L2_errors": {
+        "Pure defocus": 3.9203875689362553e-16,
+        "Defocus + fixed 60 nm RMS coma": 0.13671631661918543
+      },
+      "comparison": "s² h930(sx,sz) vs h620(x,z) after per-plane photon-density normalization"
+    },
+    "wave_05_inverse_noise": {
+      "model": "1D continuous Gaussian sampled-frequency transfer",
+      "sigma_samples": 2,
+      "regularization_alpha": 0.001,
+      "max_direct_gain_in_plotted_band": 373791533.2242257,
+      "max_regularized_gain": 15.811358422140696
+    },
+    "wave_06_bead_pixel": {
+      "sphere_diameter_nm": 200,
+      "sensor_pixel_um": 3.76,
+      "detector_model": "square integration, no binning; actual magnification assumed equal to nominal",
+      "normalization": "own-peak used only for profile width display, not quantitative 3D kernel construction",
+      "results": [
+        {
+          "magnification": 20,
+          "NA": 0.4,
+          "pixel_um": 0.188,
+          "fwhm_point_um": 0.7974705835630881,
+          "fwhm_bead_um": 0.8023753480693389,
+          "fwhm_bead_pixel_um": 0.8096500927965943,
+          "bead_relative_fwhm_change_percent": 0.61504017920464,
+          "bead_pixel_relative_fwhm_change_percent": 1.527267523660658,
+          "focal_peak_bead_over_point": 0.9836082142392202,
+          "nyquist_max_pixel_um": 0.38749999999999996
+        },
+        {
+          "magnification": 5,
+          "NA": 0.14,
+          "pixel_um": 0.752,
+          "fwhm_point_um": 2.2784871887047884,
+          "fwhm_bead_um": 2.2801910316765692,
+          "fwhm_bead_pixel_um": 2.321254264995344,
+          "bead_relative_fwhm_change_percent": 0.07477957217523201,
+          "bead_pixel_relative_fwhm_change_percent": 1.8769943716412385,
+          "focal_peak_bead_over_point": 0.9979871441714053,
+          "nyquist_max_pixel_um": 1.107142857142857
+        }
+      ]
+    }
+  },
+  "verification": {
+    "hankel_400_vs_800_max_absolute_intensity_difference": 1.8596235662471372e-14,
+    "FFT_pupil_radius64_vs128_central12um_relativeL2": 0.0016533748108120317,
+    "same_pupil_total_energy_relative_spread": 1.7419063153695233e-16,
+    "sphere_order8_vs12_max_peak_relative_difference": 4.0016211187356955e-08
+  }
+}

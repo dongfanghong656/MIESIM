@@ -1,0 +1,1077 @@
+[
+  {
+    "id": "W01",
+    "title": "Electromagnetic diffraction in optical systems, II. Structure of the image field in an aplanatic system",
+    "authors": [
+      "B. Richards",
+      "E. Wolf"
+    ],
+    "year": 1959,
+    "doi": "10.1098/rspa.1959.0200",
+    "url": "https://royalsocietypublishing.org/rspa/article/253/1274/358/10622/Electromagnetic-diffraction-in-optical-systems-II",
+    "claims": [
+      "Vector diffraction is the relevant foundation for high-aperture image fields."
+    ],
+    "limitations": [
+      "Aplanatic homogeneous-system theory; not a proof that an unknown microscope has no aberrations.",
+      "Publisher page indexed; direct full-text access returned 403."
+    ],
+    "evidence_level": "primary_publisher_metadata_and_abstract",
+    "evidence_level_zh": "原始论文：出版社书目/摘要",
+    "canonical_id": "W01"
+  },
+  {
+    "id": "W02",
+    "title": "Lecture 22: Coherent and incoherent imaging",
+    "authors": [
+      "MIT OpenCourseWare"
+    ],
+    "year": 2009,
+    "url": "https://ocw.mit.edu/courses/2-71-optics-spring-2009/bebe78c6a2ae2603a0d1a3ea85e0b4ca_MIT2_71S09_lec22.pdf",
+    "claims": [
+      "Coherent imaging is linear in field; incoherent imaging is linear in intensity under the stated model.",
+      "The incoherent OTF is the autocorrelation of the coherent pupil/transfer function."
+    ],
+    "limitations": [
+      "Official educational primary source; scalar idealization must be stated.",
+      "Some reproduced figures in the lecture have separate copyright restrictions; reuse requires attention to the original rights holders."
+    ],
+    "evidence_level": "official_full_text_lecture",
+    "evidence_level_zh": "官方课程讲义：全文",
+    "canonical_id": "W02"
+  },
+  {
+    "id": "W03",
+    "title": "Experimental test of an analytical model of aberration in an oil-immersion objective lens used in three-dimensional light microscopy",
+    "authors": [
+      "Sarah Frisken Gibson",
+      "Frederick Lanni"
+    ],
+    "year": 1992,
+    "doi": "10.1364/JOSAA.9.000154",
+    "url": "https://opg.optica.org/josaa/abstract.cfm?uri=josaa-9-1-154",
+    "claims": [
+      "Refractive-index mismatch, coverslip and non-design conditions degrade 3D microscope imaging.",
+      "A physical OPD-based model is compared with experimental measurements."
+    ],
+    "limitations": [
+      "Do not identify an axisymmetric model with arbitrary asymmetric aberration.",
+      "The 1991 JOSAA 8,1601 version links this 1992 version under Corrections."
+    ],
+    "evidence_level": "primary_publisher_abstract",
+    "evidence_level_zh": "原始论文：出版社摘要",
+    "canonical_id": "W03"
+  },
+  {
+    "id": "W04",
+    "title": "Fast and accurate three-dimensional point spread function computation for fluorescence microscopy",
+    "authors": [
+      "Jizhou Li",
+      "Feng Xue",
+      "Thierry Blu"
+    ],
+    "year": 2017,
+    "doi": "10.1364/JOSAA.34.001029",
+    "url": "https://fxue-casc.github.io/josaa_2017_published.pdf",
+    "claims": [
+      "Bessel-series computation approximates the Gibson–Lanni integral with controlled numerical error.",
+      "A Gaussian is not an accurate description of the complete 3D fluorescence PSF.",
+      "Experimental bead conditions can differ from actual specimen imaging conditions."
+    ],
+    "limitations": [
+      "Numerical model accuracy is not experimental truth.",
+      "Radially symmetric scalar model does not represent all aberrations."
+    ],
+    "evidence_level": "primary_author_hosted_full_text",
+    "evidence_level_zh": "原始论文：作者托管全文",
+    "canonical_id": "W04"
+  },
+  {
+    "id": "W05",
+    "title": "Lecture Notes on Wave Optics",
+    "authors": [
+      "MIT OpenCourseWare"
+    ],
+    "year": 2014,
+    "url": "https://ocw.mit.edu/courses/2-71-optics-spring-2014/4b53a5747f9b58b9b73b2bbcc39945f0_MIT2_71S14_lec16_notes.pdf",
+    "claims": [
+      "A coherent impulse response propagates field via a Fresnel integral under the stated approximation."
+    ],
+    "limitations": [
+      "Fresnel approximation is paraxial; not full vector Maxwell propagation."
+    ],
+    "evidence_level": "official_full_text_lecture",
+    "evidence_level_zh": "官方课程讲义：全文",
+    "canonical_id": "W05"
+  },
+  {
+    "id": "W06",
+    "title": "Zernike polynomials and atmospheric turbulence",
+    "authors": [
+      "Robert J. Noll"
+    ],
+    "year": 1976,
+    "doi": "10.1364/JOSA.66.000207",
+    "url": "https://opg.optica.org/josa/abstract.cfm?uri=josa-66-3-207",
+    "claims": [
+      "Zernike modes provide an orthogonal expansion of wavefront on a circular pupil; normalization and indexing conventions matter."
+    ],
+    "limitations": [
+      "Original application is atmospheric turbulence, not a direct calibration of microscope objectives.",
+      "Do not import atmospheric coefficient statistics into a microscope."
+    ],
+    "evidence_level": "primary_publisher_metadata_and_paper",
+    "evidence_level_zh": "原始论文：出版社书目及论文记录",
+    "canonical_id": "W06"
+  },
+  {
+    "id": "W07",
+    "title": "Bayesian-Based Iterative Method of Image Restoration",
+    "authors": [
+      "William Hadley Richardson"
+    ],
+    "year": 1972,
+    "doi": "10.1364/JOSA.62.000055",
+    "url": "https://opg.optica.org/josa/abstract.cfm?uri=josa-62-1-55",
+    "claims": [
+      "Foundational Bayesian derivation of an iterative nonnegative restoration method."
+    ],
+    "limitations": [
+      "A historical Bayesian derivation does not make all deconvolution algorithms Bayesian."
+    ],
+    "evidence_level": "primary_publisher_abstract",
+    "evidence_level_zh": "原始论文：出版社摘要",
+    "canonical_id": "W07"
+  },
+  {
+    "id": "W08",
+    "title": "An iterative technique for the rectification of observed distributions",
+    "authors": [
+      "Leon B. Lucy"
+    ],
+    "year": 1974,
+    "doi": "10.1086/111605",
+    "url": "https://adsabs.harvard.edu/pdf/1974AJ.....79..745L",
+    "claims": [
+      "Foundational iterative rectification/deconvolution method in statistical astronomy."
+    ],
+    "limitations": [
+      "Noise likelihood, kernel and stopping still need to match the imaging application."
+    ],
+    "evidence_level": "primary_paper_repository",
+    "evidence_level_zh": "原始论文：学术仓储全文",
+    "canonical_id": "W08"
+  },
+  {
+    "id": "W09",
+    "title": "DeconvolutionLab2: An open-source software for deconvolution microscopy",
+    "authors": [
+      "David Sage et al."
+    ],
+    "year": 2017,
+    "doi": "10.1016/j.ymeth.2016.12.015",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/28057586/",
+    "code_url": "https://bigwww.epfl.ch/deconvolution/deconvolutionlab2/",
+    "claims": [
+      "Open-source microscopy deconvolution provides multiple algorithm families and explicit implementations."
+    ],
+    "limitations": [
+      "Software availability is not an accuracy guarantee or an endorsement of one algorithm for all data."
+    ],
+    "evidence_level": "primary_paper_abstract_and_author_software",
+    "evidence_level_zh": "原始论文摘要＋作者软件",
+    "canonical_id": "W09"
+  },
+  {
+    "id": "W10",
+    "title": "Richardson–Lucy algorithm with total variation regularization for 3D confocal microscope deconvolution",
+    "authors": [
+      "Nicolas Dey",
+      "Laure Blanc-Féraud",
+      "Christophe Zimmer",
+      "Pascal Roux",
+      "Zvi Kam",
+      "Jean-Christophe Olivo-Marin",
+      "Josiane Zerubia"
+    ],
+    "year": 2006,
+    "doi": "10.1002/jemt.20294",
+    "url": "https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/jemt.20294",
+    "claims": [
+      "Combining RL with TV regularization can suppress unstable oscillations while preserving edges."
+    ],
+    "limitations": [
+      "Edge preservation involves a prior/penalty and can bias morphology; not assumption-free."
+    ],
+    "evidence_level": "primary_publisher_abstract",
+    "evidence_level_zh": "原始论文：出版社摘要",
+    "canonical_id": "W10"
+  },
+  {
+    "id": "W11",
+    "title": "Quality assessment in light microscopy for routine use through simple tools and robust metrics",
+    "authors": [
+      "Orestis Faklaris et al."
+    ],
+    "year": 2022,
+    "doi": "10.1083/jcb.202107093",
+    "url": "https://rupress.org/jcb/article/221/11/e202107093/213512/Quality-assessment-in-light-microscopy-for-routine",
+    "claims": [
+      "Ten microscopy core facilities developed practical QC methods and MetroloJ_QC.",
+      "Metrics include PSF, illumination, chromatic alignment, drift, positioning and camera noise.",
+      "Measured/theoretical FWHM<1.5 is proposed as a practical health tolerance, not precision-kernel certification.",
+      "100 versus 175 nm beads influence high-NA measured FWHM, and off-axis bead PSFs can be asymmetric."
+    ],
+    "limitations": [
+      "The paper addresses routine QC and does not certify the highest-achievable PSF accuracy of any other instrument.",
+      "Do not copy confocal numerical criteria unmodified to a wide-field setup."
+    ],
+    "evidence_level": "primary_publisher_full_text",
+    "evidence_level_zh": "原始论文：出版社全文",
+    "canonical_id": "W11"
+  },
+  {
+    "id": "W12",
+    "title": "Measuring and interpreting point spread functions to determine confocal microscope resolution and ensure quality control",
+    "authors": [
+      "Richard W. Cole",
+      "Tushare Jinadasa",
+      "Claire M. Brown"
+    ],
+    "year": 2011,
+    "doi": "10.1038/nprot.2011.407",
+    "url": "https://www.nature.com/articles/nprot.2011.407",
+    "full_text_url": "https://imaging.gurdon.cam.ac.uk/ext/files/Cole_et_al_2011.pdf",
+    "claims": [
+      "A detailed protocol uses fluorescent microspheres and 3D PSFs for microscope quality control."
+    ],
+    "limitations": [
+      "Confocal acquisition uses excitation/detection and pinhole characteristics different from camera wide-field imaging."
+    ],
+    "evidence_level": "primary_protocol_and_author_institution_pdf",
+    "evidence_level_zh": "原始实验协议＋机构PDF",
+    "canonical_id": "W12"
+  },
+  {
+    "id": "W13",
+    "title": "Depth-variant maximum-likelihood restoration for three-dimensional fluorescence microscopy",
+    "authors": [
+      "Chrysanthe Preza",
+      "José-Angel Conchello"
+    ],
+    "year": 2004,
+    "doi": "10.1364/JOSAA.21.001593",
+    "url": "https://opg.optica.org/josaa/abstract.cfm?uri=josaa-21-9-1593",
+    "claims": [
+      "Depth-varying aberration can be handled through a strata-based image-formation model and EM/maximum-likelihood restoration."
+    ],
+    "limitations": [
+      "This is an approximate depth-varying model, not proof of a single universal convolution kernel."
+    ],
+    "evidence_level": "primary_publisher_abstract",
+    "evidence_level_zh": "原始论文：出版社摘要",
+    "canonical_id": "W13"
+  },
+  {
+    "id": "W14",
+    "title": "ASI6200 Pro Series official product specification",
+    "authors": [
+      "ZWO"
+    ],
+    "url": "https://www.zwoastro.com/product/asi6200/",
+    "claims": [
+      "ASI6200MM/MC Pro uses 3.76 micrometre pixels."
+    ],
+    "limitations": [
+      "Effective object sampling depends on actual magnification and binning; product noise figures are not an independent calibration of an installed camera."
+    ],
+    "evidence_level": "official_manufacturer_specification",
+    "evidence_level_zh": "厂商原始产品规格",
+    "accessed": "2026-10-22",
+    "canonical_id": "W14"
+  },
+  {
+    "id": "W15",
+    "title": "Photophysical image analysis for sCMOS cameras: Noise modelling and estimation of background parameters in fluorescence-microscopy images",
+    "authors": [
+      "Dibyajyoti Mohanta",
+      "Radhika Nambannor Kunnath",
+      "Erik Clarkson",
+      "Albertas Dvirnas",
+      "Fredrik Westerlund",
+      "Tobias Ambjörnsson"
+    ],
+    "year": 2025,
+    "doi": "10.1371/journal.pone.0335310",
+    "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0335310",
+    "claims": [
+      "Camera fluorescence measurements can require a Poisson–Gaussian noise model and explicit background estimation."
+    ],
+    "limitations": [
+      "This supports the general modelling issue; its calibrated sCMOS model is not automatically a calibration of another camera."
+    ],
+    "evidence_level": "primary_publisher_full_text",
+    "evidence_level_zh": "原始论文：出版社全文",
+    "canonical_id": "W15"
+  },
+  {
+    "id": "O01",
+    "title": "Deconvolution methods for mitigation of transverse blurring in optical coherence tomography",
+    "authors": [
+      "Tyler S. Ralston",
+      "Daniel L. Marks",
+      "Farzad Kamalabadi",
+      "Stephen A. Boppart"
+    ],
+    "year": 2005,
+    "doi": "10.1109/TIP.2005.852469",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/16190462/",
+    "full_text_url": "https://www.researchgate.net/publication/7574994_Deconvolution_methods_for_mitigation_of_transverse_blurring_in_optical_coherence_tomography",
+    "claims": [
+      "深度依赖Gaussian核",
+      "比较TSVD/Tikhonov复数据与幅值数据",
+      "RL仅用magnitude fringe data",
+      "稀疏散射实验改善范围达约两倍confocal region"
+    ],
+    "limitations": [
+      "稀疏与模型近似",
+      "改善范围不等于统一判据下任意组织DOF倍率"
+    ],
+    "evidence_level": "primary_author_uploaded_full_text",
+    "evidence_level_zh": "原始论文：作者上传全文",
+    "accessed": "2026-10-22",
+    "canonical_id": "O01"
+  },
+  {
+    "id": "O02",
+    "title": "Non-iterative numerical method for laterally superresolving Fourier domain optical coherence tomography",
+    "authors": [
+      "Yoshiaki Yasuno",
+      "Jun-Ichiro Sugisaka",
+      "Yusuke Sando",
+      "Yoshifumi Nakamura",
+      "Shuichi Makita",
+      "Masahide Itoh",
+      "Toyohiko Yatagai"
+    ],
+    "year": 2006,
+    "doi": "10.1364/OE.14.001006",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19503421/",
+    "full_text_url": "https://tsukuba.repo.nii.ac.jp/record/21732/files/OE_14-3.pdf",
+    "claims": [
+      "数值反卷积补偿FD-OCT横向离焦"
+    ],
+    "limitations": [
+      "本次仅核摘要，PDF访问429",
+      "不从题名推导普适超分辨能力"
+    ],
+    "evidence_level": "primary_abstract",
+    "evidence_level_zh": "原始论文：摘要",
+    "accessed": "2026-10-22",
+    "canonical_id": "O02"
+  },
+  {
+    "id": "O03",
+    "title": "Improved lateral resolution in optical coherence tomography by digital focusing using two-dimensional numerical diffraction method",
+    "authors": [
+      "Lingfeng Yu",
+      "Bin Rao",
+      "Jun Zhang",
+      "Jianping Su",
+      "Qiang Wang",
+      "Shuguang Guo",
+      "Zhongping Chen"
+    ],
+    "year": 2007,
+    "doi": "10.1364/OE.15.007634",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19547090/",
+    "full_text_url": "https://bpb-us-e2.wpmucdn.com/faculty.sites.uci.edu/dist/3/352/files/2011/03/J105_digital-focusing.pdf",
+    "claims": [
+      "标量衍射数字重聚焦",
+      "用幅值和相位",
+      "盖玻片表面相位参考",
+      "不会恢复离焦造成照明能量损失"
+    ],
+    "limitations": [
+      "相位稳定与多散射",
+      "文中未完整包括散斑及Gaussian照明传播"
+    ],
+    "evidence_level": "primary_institutional_full_text",
+    "evidence_level_zh": "原始论文：机构全文",
+    "accessed": "2026-10-22",
+    "canonical_id": "O03"
+  },
+  {
+    "id": "O04",
+    "title": "Interferometric synthetic aperture microscopy",
+    "authors": [
+      "Tyler S. Ralston",
+      "Daniel L. Marks",
+      "P. Scott Carney",
+      "Stephen A. Boppart"
+    ],
+    "year": 2007,
+    "doi": "10.1038/nphys514",
+    "url": "https://www.nature.com/articles/nphys514",
+    "full_text_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4308056/",
+    "claims": [
+      "相干逆散射计算重建",
+      "傅里叶空间覆盖与离焦表观模糊不同"
+    ],
+    "limitations": [
+      "本次原论文摘要与O08后续全文交叉核对",
+      "要求相干数据和散射模型"
+    ],
+    "evidence_level": "primary_abstract_plus_method_crosscheck",
+    "evidence_level_zh": "原始摘要＋后续方法交叉核验",
+    "accessed": "2026-10-22",
+    "canonical_id": "O04"
+  },
+  {
+    "id": "O05",
+    "title": "Spatially deconvolved optical coherence tomography",
+    "authors": [
+      "Peter D. Woolliams",
+      "Robert A. Ferguson",
+      "Christian Hart",
+      "Alex Grimwood",
+      "Peter H. Tomlins"
+    ],
+    "year": 2010,
+    "doi": "10.1364/AO.49.002014",
+    "url": "https://opg.optica.org/ao/abstract.cfm?uri=ao-49-11-2014",
+    "claims": [
+      "B-scan分2400子图",
+      "局部实测PSF与RL",
+      "横向改善3.1µm、轴向4.5µm"
+    ],
+    "limitations": [
+      "本次仅摘要",
+      "输入幅值或平方强度需复现时全文核实",
+      "数字不是DOF倍率"
+    ],
+    "evidence_level": "primary_abstract",
+    "evidence_level_zh": "原始论文：摘要",
+    "accessed": "2026-10-22",
+    "canonical_id": "O05"
+  },
+  {
+    "id": "O06",
+    "title": "Gabor-based fusion technique for Optical Coherence Microscopy",
+    "authors": [
+      "Jannick P. Rolland",
+      "Panomsak Meemon",
+      "Supraka Murali",
+      "Kevin P. Thompson",
+      "Kye-sung Lee"
+    ],
+    "year": 2010,
+    "doi": "10.1364/OE.18.003632",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/20389373/",
+    "full_text_url": "https://stars.library.ucf.edu/facultybib2010/708/",
+    "claims": [
+      "液体透镜动态焦位与Gabor融合",
+      "多焦位实现大深度高横向分辨"
+    ],
+    "limitations": [
+      "增加采集与配准",
+      "非单次离焦图像反卷积"
+    ],
+    "evidence_level": "primary_abstract_and_institutional_record",
+    "evidence_level_zh": "原始摘要＋机构记录",
+    "accessed": "2026-10-22",
+    "canonical_id": "O06"
+  },
+  {
+    "id": "O07",
+    "title": "Automatic estimation of point-spread-function for deconvoluting out-of-focus optical coherence tomographic images using information entropy-based approach",
+    "authors": [
+      "Guozhong Liu",
+      "Siavash Yousefi",
+      "Zhongwei Zhi",
+      "Ruikang K. Wang"
+    ],
+    "year": 2011,
+    "doi": "10.1364/OE.19.018135",
+    "url": "https://opg.optica.org/abstract.cfm?uri=oe-19-19-18135",
+    "full_text_url": "https://www.researchgate.net/publication/51659002_Automatic_estimation_of_point-spread-function_for_deconvoluting_out-of-focus_optical_coherence_tomographic_images_using_information_entropy-based_approach",
+    "claims": [
+      "熵选择Gaussian核与RL",
+      "微球/洋葱/人体指尖例证",
+      "作者明确不包括衍射与相干散射"
+    ],
+    "limitations": [
+      "经验非负近似",
+      "模拟乘性speckle不是完整相干模型",
+      "不能视作无样品假设定理"
+    ],
+    "evidence_level": "primary_publisher_full_text_mirror",
+    "evidence_level_zh": "原始论文：出版社正文镜像",
+    "accessed": "2026-10-22",
+    "canonical_id": "O07"
+  },
+  {
+    "id": "O08",
+    "title": "Computational adaptive optics for broadband optical interferometric tomography of biological tissue",
+    "authors": [
+      "Steven G. Adie",
+      "Benedikt W. Graf",
+      "Adeel Ahmad",
+      "P. Scott Carney",
+      "Stephen A. Boppart"
+    ],
+    "year": 2012,
+    "doi": "10.1073/pnas.1121193109",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3358872/",
+    "full_text_url": "https://biophotonics.web.illinois.edu/sites/default/files/pnas.1121193109_0.pdf",
+    "claims": [
+      "双程h∝u²及光瞳卷积",
+      "CAO联合ISAM",
+      "越离焦相位稳定要求越苛刻",
+      "相位校正可能遗留幅度结构"
+    ],
+    "limitations": [
+      "单次散射与相位校正",
+      "相位恢复不了未采集能量"
+    ],
+    "evidence_level": "primary_institutional_full_text",
+    "evidence_level_zh": "原始论文：机构全文",
+    "accessed": "2026-10-22",
+    "canonical_id": "O08"
+  },
+  {
+    "id": "O09",
+    "title": "Digital focusing of OCT images based on scalar diffraction theory and information entropy",
+    "authors": [
+      "Guozhong Liu",
+      "Zhongwei Zhi",
+      "Ruikang K. Wang"
+    ],
+    "year": 2012,
+    "doi": "10.1364/BOE.3.002774",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3493221/",
+    "claims": [
+      "复信号数字传播",
+      "以熵自动选择传播距离"
+    ],
+    "limitations": [
+      "需要相位",
+      "自动距离估计不等于强度相位恢复"
+    ],
+    "evidence_level": "primary_indexed_full_text_extracts",
+    "evidence_level_zh": "原始论文：索引全文片段",
+    "accessed": "2026-10-22",
+    "canonical_id": "O09"
+  },
+  {
+    "id": "O10",
+    "title": "Speckle-constrained variational methods for image restoration in optical coherence tomography",
+    "authors": [
+      "Daiqiang Yin",
+      "Ying Gu",
+      "Ping Xue"
+    ],
+    "year": 2013,
+    "doi": "10.1364/JOSAA.30.000878",
+    "url": "https://opg.optica.org/josaa/abstract.cfm?uri=josaa-30-5-878",
+    "claims": [
+      "信号相关散斑约束+PSF+BM3D型变分先验",
+      "人体皮肤原始数据",
+      "指出log域简单AWGN不可直接扩展反卷积"
+    ],
+    "limitations": [
+      "本次仅摘要",
+      "具体保真公式未核实不应代写"
+    ],
+    "evidence_level": "primary_abstract",
+    "evidence_level_zh": "原始论文：摘要",
+    "accessed": "2026-10-22",
+    "canonical_id": "O10"
+  },
+  {
+    "id": "O11",
+    "title": "Convolutional dictionary learning for blind deconvolution of optical coherence tomography images",
+    "authors": [
+      "Junzhe Wang",
+      "Brendt Wohlberg",
+      "R. B. A. Adamson"
+    ],
+    "year": 2022,
+    "doi": "10.1364/BOE.447394",
+    "url": "https://brendt.wohlberg.net/publications/wang-2022-convolutional.html",
+    "full_text_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9045938/",
+    "claims": [
+      "复A-line盲去卷积",
+      "复一维轴向核",
+      "稀疏约束抑制旁瓣，权重缓解组织亮度损失"
+    ],
+    "limitations": [
+      "主要轴向",
+      "不直接证明横向DOF恢复",
+      "稀疏先验有偏差风险"
+    ],
+    "evidence_level": "primary_author_record_and_full_text_extract",
+    "evidence_level_zh": "作者记录＋原文片段",
+    "accessed": "2026-10-22",
+    "canonical_id": "O11"
+  },
+  {
+    "id": "O12",
+    "title": "Deblurring, artifact-free optical coherence tomography with deconvolution-random phase modulation",
+    "authors": [
+      "Xin Ge",
+      "Si Chen",
+      "Kan Lin",
+      "Guangming Ni",
+      "En Bo",
+      "Lulu Wang",
+      "Linbo Liu"
+    ],
+    "year": 2024,
+    "doi": "10.29026/oes.2024.230020",
+    "url": "https://www.oejournal.org/article/doi/10.29026/oes.2024.230020",
+    "full_text_url": "https://www.researchgate.net/publication/377927129_Deblurring_artifact-free_optical_coherence_tomography_with_deconvolution-random_phase_modulation",
+    "claims": [
+      "RL与数值RPM结合",
+      "正式版FWHM缩小2.5倍"
+    ],
+    "limitations": [
+      "FWHM倍率不是DOF倍率",
+      "数值相位掩模不产生新物理信息",
+      "预印本数字2.7不可代正式版"
+    ],
+    "evidence_level": "primary_paper_indexed_publisher_and_full_text_mirror",
+    "evidence_level_zh": "出版社索引＋原文镜像",
+    "accessed": "2026-10-22",
+    "canonical_id": "O12"
+  },
+  {
+    "id": "O13",
+    "title": "Image formation theory of optical coherence tomography with optical aberrations and its application to computational aberration correction",
+    "authors": [
+      "Shuichi Makita",
+      "Naoki Fukutake",
+      "Lida Zhu",
+      "Yoshiaki Yasuno"
+    ],
+    "year": 2025,
+    "doi": "10.1364/BOE.569556",
+    "url": "https://opg.optica.org/boe/abstract.cfm?uri=boe-16-11-4662",
+    "full_text_url": "https://arxiv.org/html/2501.15011v3",
+    "claims": [
+      "照明收集双光瞳与宽谱OCT",
+      "多深度CAC",
+      "指定仿真NAeff0.2、1.05µm、±100µm内Strehl>0.8",
+      "作者发布OCTPSF simulator代码"
+    ],
+    "limitations": [
+      "结果依赖指定仿真/系统设置",
+      "真核不保证全样品精确恢复"
+    ],
+    "evidence_level": "primary_full_text_with_supplement",
+    "evidence_level_zh": "原始论文：全文及补充材料",
+    "accessed": "2026-10-22",
+    "canonical_id": "O13",
+    "duplicate_ids": [
+      "P13"
+    ]
+  },
+  {
+    "id": "O14",
+    "title": "Theoretical analysis of performance limitation of computational refocusing in optical coherence tomography",
+    "authors": [
+      "Yue Zhu",
+      "Shuichi Makita",
+      "Naoki Fukutake",
+      "Yoshiaki Yasuno"
+    ],
+    "year": 2026,
+    "doi": "10.48550/arXiv.2501.13874",
+    "url": "https://arxiv.org/abs/2501.13874",
+    "full_text_url": "https://arxiv.org/html/2501.13874v3",
+    "claims": [
+      "横向采样与共焦损失约束",
+      "点扫描和空间相干全场差异",
+      "数值重聚焦无法恢复未收集光能"
+    ],
+    "limitations": [
+      "按2026-01-06 v3预印本引用",
+      "近无限MCD是所设模型内说法而非实际无限成像深度"
+    ],
+    "evidence_level": "primary_preprint_full_text",
+    "evidence_level_zh": "作者预印本：全文，未作正式刊行认证",
+    "accessed": "2026-10-22",
+    "canonical_id": "O14"
+  },
+  {
+    "id": "O15",
+    "title": "Angular compounding for speckle reduction in optical coherence tomography using geometric image registration algorithm and digital focusing",
+    "authors": [
+      "Jingjing Zhao",
+      "Yonatan Winetraub",
+      "Edwin Yuan",
+      "Warren H. Chan",
+      "Sumaira Z. Aasi",
+      "Kavita Y. Sarin",
+      "Orr Zohar",
+      "Adam de la Zerda"
+    ],
+    "year": 2020,
+    "doi": "10.1038/s41598-020-58454-0",
+    "url": "https://www.nature.com/articles/s41598-020-58454-0",
+    "full_text_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7002526/",
+    "claims": [
+      "相位变化影响两散射体叠加幅度",
+      "角度复合+配准+数字聚焦减少speckle"
+    ],
+    "limitations": [
+      "角度变化也可改响应与对象方向散射",
+      "重复同静态图不等于独立look"
+    ],
+    "evidence_level": "primary_full_text_extracts",
+    "evidence_level_zh": "原始论文：全文片段",
+    "accessed": "2026-10-22",
+    "canonical_id": "O15"
+  },
+  {
+    "id": "O16",
+    "title": "Deconvolution methods for image deblurring in optical coherence tomography",
+    "authors": [
+      "Yiheng Liu",
+      "Yanmei Liang",
+      "Guoguang Mu",
+      "Xiaonong Zhu"
+    ],
+    "year": 2009,
+    "doi": "10.1364/JOSAA.26.000072",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19109602/",
+    "claims": [
+      "二维可分离轴横PSF核",
+      "两次一维去卷积与一次二维去卷积工程比较"
+    ],
+    "limitations": [
+      "摘要不能证明一般可分离或正则化逆的等价",
+      "输入域具体定义需原文核对"
+    ],
+    "evidence_level": "primary_abstract",
+    "evidence_level_zh": "原始论文：摘要",
+    "accessed": "2026-10-22",
+    "canonical_id": "O16"
+  },
+  {
+    "id": "P01",
+    "title": "Phase retrieval for high-numerical-aperture optical systems",
+    "authors": [
+      "Bridget M. Hanser",
+      "Mats G. L. Gustafsson",
+      "David A. Agard",
+      "John W. Sedat"
+    ],
+    "year": 2003,
+    "doi": "10.1364/OL.28.000801",
+    "url": "https://opg.optica.org/ol/abstract.cfm?uri=ol-28-10-801",
+    "claims": [
+      "高数值孔径显微系统的强度PSF可用于相位恢复，并在球面支撑上描述广义光瞳。"
+    ],
+    "limitations": [
+      "本文不证明任意未知显微镜到OCT的无条件跨波段映射。",
+      "本轮核验原始论文摘要及书目信息，未读取付费全文。"
+    ],
+    "evidence_level": "primary_paper_abstract_verified",
+    "evidence_level_zh": "原始论文：摘要核验",
+    "canonical_id": "P01"
+  },
+  {
+    "id": "P02",
+    "title": "Phase-retrieved pupil functions in wide-field fluorescence microscopy",
+    "authors": [
+      "B. M. Hanser",
+      "M. G. L. Gustafsson",
+      "D. A. Agard",
+      "J. W. Sedat"
+    ],
+    "year": 2004,
+    "doi": "10.1111/j.0022-2720.2004.01393.x",
+    "url": "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.0022-2720.2004.01393.x",
+    "claims": [
+      "由实测3D PSF估计有效2D光瞳，并把已知折射率失配像差加入光瞳以预测PSF。",
+      "作者模拟反卷积中，恢复光瞳生成的核可达到与直接实测核相近的表现。"
+    ],
+    "limitations": [
+      "这里的光瞳是所测系统的有效光瞳，不自动等于纯物镜或OCT收发光瞳。",
+      "本轮读取出版社Summary与文献信息，未读取全部付费正文。"
+    ],
+    "evidence_level": "primary_paper_publisher_summary_verified",
+    "evidence_level_zh": "原始论文：出版社Summary核验",
+    "canonical_id": "P02"
+  },
+  {
+    "id": "P03",
+    "title": "Characterization of spatially varying aberrations for wide field-of-view microscopy",
+    "authors": [
+      "Guoan Zheng",
+      "Xiaoze Ou",
+      "Roarke Horstmeyer",
+      "Changhuei Yang"
+    ],
+    "year": 2013,
+    "doi": "10.1364/OE.21.015131",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3724395/",
+    "claims": [
+      "多离焦强度图可以恢复视场中多个位置的有效复光瞳。",
+      "作者示例中约350个微球位置用于表征空间变化像差。"
+    ],
+    "limitations": [
+      "这是视场变化的实验证据，不是某一指定镜头型号的批次差统计。"
+    ],
+    "evidence_level": "primary_paper_indexed_fulltext_and_abstract_verified",
+    "evidence_level_zh": "原始论文：索引全文和摘要核验",
+    "canonical_id": "P03"
+  },
+  {
+    "id": "P04",
+    "title": "Phase retrieval using multiple illumination wavelengths",
+    "authors": [
+      "Peng Bao",
+      "Fucai Zhang",
+      "Giancarlo Pedrini",
+      "Wolfgang Osten"
+    ],
+    "year": 2008,
+    "doi": "10.1364/OL.33.000309",
+    "url": "https://opg.optica.org/ol/abstract.cfm?uri=ol-33-4-309",
+    "claims": [
+      "多波长衍射强度的迭代相位恢复已有仿真与实验。",
+      "作者采用双波长干涉原理扩展无包裹相位量程。"
+    ],
+    "limitations": [
+      "非显微镜到OCT专用迁移验证；已知共同对象/色散与测量模型条件不能省略。",
+      "本轮读取出版社摘要，未获取完整付费正文。"
+    ],
+    "evidence_level": "primary_paper_abstract_verified",
+    "evidence_level_zh": "原始论文：摘要核验",
+    "canonical_id": "P04"
+  },
+  {
+    "id": "P05",
+    "title": "Point spread function in interferometric scattering microscopy (iSCAT). Part I: aberrations in defocusing and axial localization",
+    "authors": [
+      "Reza Gholami Mahmoodabadi",
+      "Richard W. Taylor",
+      "Martin Kaller",
+      "Susann Spindler",
+      "Vahid Sandoghdar"
+    ],
+    "year": 2020,
+    "doi": "10.1364/OE.401374",
+    "url": "https://arxiv.org/html/2006.15332v1",
+    "claims": [
+      "矢量iPSF模型包含界面几何像差、传播/Gouy相位与粒子材料散射相位，作者结合实验和FDTD验证。",
+      "移动粒子与移动焦平面的相位变化机制不同。"
+    ],
+    "limitations": [
+      "iSCAT对相位敏感不等于单幅图直接提供完整复场。",
+      "粒子散射相位和界面贡献不能冒充纯物镜像差。"
+    ],
+    "evidence_level": "primary_paper_author_fulltext_read",
+    "evidence_level_zh": "原始论文：作者全文已读",
+    "canonical_id": "P05"
+  },
+  {
+    "id": "P06",
+    "title": "Fast photothermal spatial light modulation for quantitative phase imaging at the nanoscale",
+    "authors": [
+      "Hadrien M. L. Robert",
+      "Kristýna Holanová",
+      "Łukasz Bujak",
+      "Milan Vala",
+      "Verena Henrichs",
+      "Zdeněk Lánský",
+      "Marek Piliarik"
+    ],
+    "year": 2021,
+    "doi": "10.1038/s41467-021-23252-3",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8134576/",
+    "claims": [
+      "相位调制的iSCAT可用于定量获取弱散射体的相对散射相位。",
+      "存在作者公开的幅值与相位计算代码。"
+    ],
+    "limitations": [
+      "增加了相位调制硬件；不能由此宣称普通单幅iSCAT图完整测相。",
+      "本轮网页直接打开遇反爬，核验了PubMed和出版社/PMC索引中的原文摘要与段落。"
+    ],
+    "evidence_level": "primary_paper_abstract_and_indexed_passages_verified",
+    "evidence_level_zh": "原始论文：摘要及索引段落核验",
+    "canonical_id": "P06"
+  },
+  {
+    "id": "P07",
+    "title": "Wavefront measurement using computational adaptive optics",
+    "authors": [
+      "Fredrick A. South",
+      "Yuan-Zhi Liu",
+      "Andrew J. Bower",
+      "Yang Xu",
+      "P. Scott Carney",
+      "Stephen A. Boppart"
+    ],
+    "year": 2018,
+    "doi": "10.1364/JOSAA.35.000466",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5915320/",
+    "claims": [
+      "点扫描OCT点响应由照明和回收复场相乘，横向传递函数为对应光瞳卷积。",
+      "CAO校正相位与单程光瞳相位一般不是直接相同或简单两倍关系。",
+      "作者比较渐近、逆自卷积和直接前向模型估计，高阶像差出现串扰。"
+    ],
+    "limitations": [
+      "建模以单散射、局部系统和所述采样/近似为前提。",
+      "在不同傅里叶和互易场约定中，符号和共轭必须一致。"
+    ],
+    "evidence_level": "primary_paper_fulltext_read",
+    "evidence_level_zh": "原始论文：全文已读",
+    "canonical_id": "P07"
+  },
+  {
+    "id": "P08",
+    "title": "Stability in computed optical interferometric tomography (Part I): Stability requirements",
+    "authors": [
+      "Nathan D. Shemonski",
+      "Steven G. Adie",
+      "Yuan-Zhi Liu",
+      "Fredrick A. South",
+      "P. Scott Carney",
+      "Stephen A. Boppart"
+    ],
+    "year": 2014,
+    "doi": "10.1364/OE.22.019183",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4162365/",
+    "claims": [
+      "数值离焦和像差补偿的相位稳定要求由数学分析、仿真和实验评估。",
+      "关键量是某一点被扫描光束探测期间的interrogation time。"
+    ],
+    "limitations": [
+      "不能把幅值图稳定视为相对相位已经稳定。",
+      "本轮全文网页遇反爬，核验原始摘要和interrogation time相关索引段落。"
+    ],
+    "evidence_level": "primary_paper_abstract_and_indexed_passages_verified",
+    "evidence_level_zh": "原始论文：摘要及索引段落核验",
+    "canonical_id": "P08"
+  },
+  {
+    "id": "P09",
+    "title": "Computational adaptive optics in phase-unstable optical coherence tomography",
+    "authors": [
+      "Sebastián Ruiz-Lopera",
+      "René Restrepo",
+      "Carlos Cuartas-Vélez",
+      "Brett E. Bouma",
+      "Néstor Uribe-Patarroyo"
+    ],
+    "year": 2020,
+    "doi": "10.1364/OL.401283",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8384075/",
+    "claims": [
+      "SHARP采用短范围稳相与依次一维像差修正，在二维相位不稳定的SS-OCT中实现可分离像差补偿。",
+      "所需条件包括Nyquist采样和足够小的复幅值运动变化。"
+    ],
+    "limitations": [
+      "只对可分离像差适用，不处理任意随机相位损坏。",
+      "文中摘要4 z_R与末段5 z_R存在表述差异，不能将其自动改写为普适4或5倍焦深。"
+    ],
+    "evidence_level": "primary_paper_fulltext_read",
+    "evidence_level_zh": "原始论文：全文已读",
+    "canonical_id": "P09"
+  },
+  {
+    "id": "P10",
+    "title": "Ultrahigh-resolution, high-speed, Fourier domain optical coherence tomography and methods for dispersion compensation",
+    "authors": [
+      "Maciej Wojtkowski",
+      "Vivek J. Srinivasan",
+      "Tony H. Ko",
+      "James G. Fujimoto",
+      "Andrzej Kowalczyk",
+      "Jay S. Duker"
+    ],
+    "year": 2004,
+    "doi": "10.1364/OPEX.12.002404",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19475077/",
+    "claims": [
+      "谱域OCT的色散补偿是已有原始研究支撑的重建环节。"
+    ],
+    "limitations": [
+      "本轮核验题名、作者、DOI与公开索引，未成功获取完整正文；不凭该来源给出本文未核实的性能数字。"
+    ],
+    "evidence_level": "primary_paper_metadata_verified",
+    "evidence_level_zh": "原始论文：书目信息核验",
+    "canonical_id": "P10"
+  },
+  {
+    "id": "P11",
+    "title": "Microscope Objectives: Types, Correction Classes & Applications",
+    "authors": [
+      "Evident Scientific"
+    ],
+    "url": "https://evidentscientific.com/en/microscope-resource/knowledge-hub/anatomy/objectives",
+    "claims": [
+      "厂家说明物镜按具体规格、用途和物理约束设计，像质取决于正确选型和使用条件。"
+    ],
+    "limitations": [
+      "没有逐型号、逐批次的RMS波前分布，不能用本资料量化批次差。",
+      "网页检索日期2026-10-22。"
+    ],
+    "evidence_level": "manufacturer_primary_technical_document",
+    "evidence_level_zh": "厂商原始技术文档",
+    "canonical_id": "P11"
+  },
+  {
+    "id": "P12",
+    "title": "High precision wavefront control in point spread function engineering for single emitter localization",
+    "authors": [
+      "M. Siemons",
+      "C. N. Hulleman",
+      "R. Ø. Thorsen",
+      "C. S. Smith",
+      "S. Stallinga"
+    ],
+    "year": 2018,
+    "doi": "10.1364/OE.26.008397",
+    "url": "https://arxiv.org/abs/1802.06584",
+    "claims": [
+      "在特定带SLM的荧光系统校准中，作者报告30分钟内小于20 mλ的波前控制，并通过矢量PSF拟合微球栈恢复像差。"
+    ],
+    "limitations": [
+      "这是特定设备、指标和时间窗，不是所有PSF测量的通用最高精度，也不能认证其他装置的水平。"
+    ],
+    "evidence_level": "primary_paper_author_abstract_verified",
+    "evidence_level_zh": "原始论文：作者摘要核验",
+    "canonical_id": "P12"
+  },
+  {
+    "id": "P13",
+    "title": "Image formation theory of optical coherence tomography with optical aberrations and its application to computational aberration correction",
+    "authors": [
+      "Shuichi Makita",
+      "Naoki Fukutake",
+      "Lida Zhu",
+      "Yoshiaki Yasuno"
+    ],
+    "year": 2025,
+    "doi": "10.1364/BOE.569556",
+    "url": "https://arxiv.org/html/2501.15011v3",
+    "claims": [
+      "提出含像差的OCT成像理论及仿真方法，对双光瞳、宽谱、近轴/窄带近似和多深度CAC作区分。",
+      "其NAeff0.2、中心波长1.05µm特定仿真中，±100µm离焦区间Strehl高于0.8；该数字不是一般装置的焦深拓展倍数。"
+    ],
+    "limitations": [
+      "应严格区分仿真条件、体模与视网膜实验；不能将给定仿真结果直接外推到不同NA或组织多重散射。"
+    ],
+    "evidence_level": "primary_paper_author_fulltext_read",
+    "evidence_level_zh": "原始论文：作者全文已读",
+    "canonical_id": "O13",
+    "duplicate_ids": [
+      "O13"
+    ],
+    "crossref": "O13"
+  }
+]

@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0.0",
+  "project": {
+    "id": "MIESIM",
+    "name": "MIESIM / group meeting research",
+    "repository": "dongfanghong656/MIESIM",
+    "base_branch": "main",
+    "managed_branch": "chat/miesim/group-meeting-20261022"
+  },
+  "phase": "RESEARCH_DELIVERY",
+  "lifecycle_status": "ACTIVE",
+  "authority_paths": {
+    "project_agent": "PROJECT_AGENT.md",
+    "charter": "docs/00_PROJECT_CHARTER.md",
+    "requirements": "docs/requirements/MASTER_REQUIREMENTS.md",
+    "specification": "docs/specs/MASTER_SPEC.md",
+    "plan": "docs/PROJECT_PLAN.md",
+    "tasks": "docs/tasks/MASTER_TASKS.md",
+    "traceability": "docs/TRACEABILITY_MATRIX.md",
+    "artifacts": "docs/ARTIFACT_REGISTRY.md",
+    "claims": "docs/CLAIM_LEDGER.md",
+    "decisions": "docs/DECISION_REGISTER.md",
+    "risks": "docs/RISK_REGISTER.md",
+    "acceptance": "docs/TEST_AND_ACCEPTANCE.md",
+    "release": "docs/RELEASE_STATUS.md",
+    "handoff": "docs/HANDOFF.md",
+    "turn_index": "docs/turns/INDEX.md"
+  },
+  "legacy_authority_paths": {
+    "physics": "PHYSICS_CONTRACT.md",
+    "rules": "docs/PROJECT_RULES.md",
+    "design": "docs/DESIGN_SUMMARY.md",
+    "tasks": "status/round5_task_book_for_codex.md",
+    "latest_log": "status/round5_work_log.md",
+    "closeout": "status/round4_verification_log.md"
+  },
+  "counters": {
+    "requirement": 8,
+    "spec": 8,
+    "task": 7,
+    "artifact": 6,
+    "evidence": 8,
+    "decision": 6,
+    "risk": 7,
+    "turn": 1,
+    "checkpoint": 1,
+    "release": 1
+  },
+  "active_ids": {
+    "requirements": [
+      "REQ-0001",
+      "REQ-0002",
+      "REQ-0003",
+      "REQ-0004",
+      "REQ-0005",
+      "REQ-0006",
+      "REQ-0007",
+      "REQ-0008"
+    ],
+    "specs": [
+      "SPEC-0001",
+      "SPEC-0002",
+      "SPEC-0003",
+      "SPEC-0004",
+      "SPEC-0005",
+      "SPEC-0006",
+      "SPEC-0007",
+      "SPEC-0008"
+    ],
+    "tasks": [
+      "TASK-0001",
+      "TASK-0002",
+      "TASK-0003",
+      "TASK-0004",
+      "TASK-0005",
+      "TASK-0006",
+      "TASK-0007"
+    ],
+    "artifacts": [
+      "ART-0001",
+      "ART-0002",
+      "ART-0003",
+      "ART-0004",
+      "ART-0005",
+      "ART-0006"
+    ],
+    "risks": [
+      "RSK-0001",
+      "RSK-0002",
+      "RSK-0003",
+      "RSK-0004",
+      "RSK-0005",
+      "RSK-0006",
+      "RSK-0007"
+    ]
+  },
+  "latest": {
+    "turn_id": "TURN-0001",
+    "turn_path": "docs/turns/2026/10/TURN-0001.md",
+    "checkpoint_id": "CHK-0001",
+    "checkpoint_path": "docs/checkpoints/CHK-0001.md",
+    "last_synced_commit": null,
+    "last_synced_at": null
+  },
+  "sync": {
+    "capability": "READ_WRITE_ATOMIC",
+    "status": "SYNC_PARTIAL",
+    "base_revision": "41260cf3cf46a0c0cb8d1d46498bdf78ad12e446",
+    "result_revision": null,
+    "result_revision_binding": {
+      "type": "git_commit_introducing_immutable_path",
+      "path": "docs/turns/2026/10/TURN-0001.md"
+    },
+    "pending_paths": [],
+    "external_state": "EXTERNAL_UNSYNCED",
+    "error": null,
+    "verification_status_at_write": "PENDING_POST_COMMIT",
+    "note": "Public subset only. Exact SHA/readback receipt is captured after commit in the delivered package; self-reference SHA is not fabricated."
+  },
+  "blockers": [
+    "No raw fluorescence stack, registered complex mirror focus sweep, calibrated channel transfer, or independent OCT point-target dataset."
+  ],
+  "assumptions": [
+    "Teaching simulations are synthetic, not hardware acceptance.",
+    "Legacy physics contracts remain scoped to existing implementation."
+  ],
+  "next_action": "Acquire same-session fluorescence focus stack, phase-registered complex mirror sweep and held-out OCT point targets.",
+  "updated_at": "2026-10-22T13:41:43.941149+00:00"
+}

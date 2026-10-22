@@ -42,3 +42,15 @@ The first implemented stage is a rigorous low-NA scalar baseline:
 - path E separable baseline converter as the first model under test
 
 Vector Debye, Zemax POP import, full Jones pupil-dependent AOI, and FDTD checks are extension points, not silently implied completed features.
+
+
+
+<!-- GPCM:START -->
+## Managed research continuity
+
+Read PROJECT_AGENT.md and .ai/PROJECT_STATE.json for the documentation/research workstream.
+This managed section preserves all physics boundaries above. The new research directory
+contains independent teaching simulations, not a replacement direct OCT truth generator.
+Keep private method content and raw project inputs out of this public repository.
+Resolve model-convention differences explicitly before modifying the executable truth chain.
+<!-- GPCM:END -->
