@@ -99,14 +99,15 @@
     "turn_path": "docs/turns/2026/10/TURN-0001.md",
     "checkpoint_id": "CHK-0001",
     "checkpoint_path": "docs/checkpoints/CHK-0001.md",
-    "last_synced_commit": null,
-    "last_synced_at": null
+    "last_synced_commit": "28f91949b6a2a3b69602cf1630183537eb56245a",
+    "last_synced_at": "2026-10-22T13:43:47Z",
+    "verification_receipt_path": "docs/turns/receipts/TURN-0001.json"
   },
   "sync": {
     "capability": "READ_WRITE_ATOMIC",
     "status": "SYNC_PARTIAL",
     "base_revision": "41260cf3cf46a0c0cb8d1d46498bdf78ad12e446",
-    "result_revision": null,
+    "result_revision": "28f91949b6a2a3b69602cf1630183537eb56245a",
     "result_revision_binding": {
       "type": "git_commit_introducing_immutable_path",
       "path": "docs/turns/2026/10/TURN-0001.md"
@@ -114,8 +115,10 @@
     "pending_paths": [],
     "external_state": "EXTERNAL_UNSYNCED",
     "error": null,
-    "verification_status_at_write": "PENDING_POST_COMMIT",
-    "note": "Public subset only. Exact SHA/readback receipt is captured after commit in the delivered package; self-reference SHA is not fabricated."
+    "verification_status_at_write": "CONTENT_COMMIT_VERIFIED",
+    "note": "Public content commit was read back and verified. Overall SYNC_PARTIAL reflects private/binary deliverables intentionally excluded from this public repository. This receipt commit is resolved by its immutable receipt path.",
+    "public_subset_status": "SYNCED",
+    "verified_file_count": 33
   },
   "blockers": [
     "No raw fluorescence stack, registered complex mirror focus sweep, calibrated channel transfer, or independent OCT point-target dataset."
@@ -125,5 +128,5 @@
     "Legacy physics contracts remain scoped to existing implementation."
   ],
   "next_action": "Acquire same-session fluorescence focus stack, phase-registered complex mirror sweep and held-out OCT point targets.",
-  "updated_at": "2026-10-22T13:41:43.941149+00:00"
+  "updated_at": "2026-10-22T13:43:47Z"
 }

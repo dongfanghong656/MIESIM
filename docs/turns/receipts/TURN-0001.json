@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "turn_id": "TURN-0001",
+  "type": "POST_COMMIT_VERIFICATION_RECEIPT",
+  "repository": "dongfanghong656/MIESIM",
+  "branch": "chat/miesim/group-meeting-20261022",
+  "verified_at_utc": "2026-10-22T13:43:47Z",
+  "base_revision": "41260cf3cf46a0c0cb8d1d46498bdf78ad12e446",
+  "content_commit": "28f91949b6a2a3b69602cf1630183537eb56245a",
+  "content_commit_url": "https://github.com/dongfanghong656/MIESIM/commit/28f91949b6a2a3b69602cf1630183537eb56245a",
+  "verified_content_file_count": 33,
+  "exact_content_file_set_matches_manifest": true,
+  "critical_file_readbacks": [
+    {
+      "path": ".ai/PROJECT_STATE.json",
+      "ok": true,
+      "bytes": 3687,
+      "isError": false
+    },
+    {
+      "path": "docs/turns/2026/10/TURN-0001.md",
+      "ok": true,
+      "bytes": 784,
+      "isError": false
+    },
+    {
+      "path": "docs/turns/manifests/TURN-0001.json",
+      "ok": true,
+      "bytes": 11917,
+      "isError": false
+    },
+    {
+      "path": "AGENTS.md",
+      "ok": true,
+      "bytes": 2528,
+      "isError": false
+    },
+    {
+      "path": "research/group_meeting_20261022/research/public_sources.json",
+      "ok": true,
+      "bytes": 34139,
+      "isError": false
+    }
+  ],
+  "status": "SYNC_PARTIAL",
+  "public_subset_status": "SYNCED",
+  "exclusions": "Private method documents, private input files, full presentation/reader, and binary artifacts remain EXTERNAL_UNSYNCED in this public repository.",
+  "receipt_transaction": {
+    "base_revision": "28f91949b6a2a3b69602cf1630183537eb56245a",
+    "write_set": [
+      {
+        "path": ".ai/PROJECT_STATE.json",
+        "content_sha256": "efd564aafb65de3f69908608ab39485f0f3ea36217ee68c0b2e6b1eda54fbedf"
+      },
+      {
+        "path": "docs/tasks/MASTER_TASKS.md",
+        "content_sha256": "20fecde3d4a48b402e9e1e1cfabe3751df44c3249e580e8711dc3134aa663cc0"
+      },
+      {
+        "path": "docs/TEST_AND_ACCEPTANCE.md",
+        "content_sha256": "a310918129ee3dd9aab32935e875f1c1bab9aa0a5da24a5325ad01e233c5bb73"
+      },
+      {
+        "path": "docs/HANDOFF.md",
+        "content_sha256": "f52ae2e4b72ddc0a56e5b74ff18c2713ff08b4d548c307ce482966d1909e8750"
+      },
+      {
+        "path": "docs/turns/INDEX.md",
+        "content_sha256": "a99f6ab556e7a80523f3edf9ec41357c3be1f44eb9c32d6311f266977932830d"
+      },
+      {
+        "path": "docs/ARTIFACT_REGISTRY.md",
+        "content_sha256": "f40d3f6a468dfc50ea17550a21f3c6cfb0ea17561e742bb83a1c00e73bfaf7f9"
+      },
+      {
+        "path": "docs/RELEASE_STATUS.md",
+        "content_sha256": "cdcea4dbdd768295240b48057846641ca35176496cbd537207854bd7b5a6e4c1"
+      },
+      {
+        "path": "docs/turns/receipts/TURN-0001.json",
+        "content_sha256": null,
+        "self_hash_omitted": true
+      }
+    ],
+    "result_revision_binding": {
+      "type": "git_commit_introducing_immutable_path",
+      "path": "docs/turns/receipts/TURN-0001.json"
+    }
+  }
+}
